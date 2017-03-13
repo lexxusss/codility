@@ -15,10 +15,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/tape_equilibrium', 'Lessons\TimeComplexityController@tape_equilibrium');
+
 Route::get('/missing_integer', 'CountingElementsController@missing_integer');
 Route::get('/perm_check', 'CountingElementsController@perm_check');
 Route::get('/frog_river_one', 'CountingElementsController@frog_river_one');
 Route::get('/max_counters', 'CountingElementsController@max_counters');
+
+Route::get('/count_div', 'PrefixSumsController@count_div');
+Route::get('/passing_cars', 'PrefixSumsController@passing_cars');
+Route::get('/genomic_range_query', 'PrefixSumsController@genomic_range_query');
+Route::get('/min_avg_two_slice', 'PrefixSumsController@min_avg_two_slice');
 
 Route::get('/count_palindromic_slices', 'Gamma2011Controller@count_palindromic_slices');
 
@@ -32,4 +39,3 @@ Route::get('/binary_gap', 'Lessons\IterationsController@binary_gap');
 
 Route::get('/cyclic_rotation', 'Lessons\ArraysController@cyclic_rotation');
 
-Route::get('/tape_equilibrium', 'Lessons\TimeComplexityController@tape_equilibrium');
