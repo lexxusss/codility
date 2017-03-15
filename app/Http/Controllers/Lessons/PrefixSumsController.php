@@ -1,9 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Lessons;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
+/**
+ * Class PrefixSumsController
+ *
+ * https://codility.com/media/train/3-PrefixSums.pdf
+ *
+ * @package App\Http\Controllers\Lessons
+ */
 class PrefixSumsController extends Controller
 {
     /**
@@ -359,7 +366,7 @@ class PrefixSumsController extends Controller
             return $minAverageKey;
         }
 
-        $A = [4,2,2,5,1,5,8];
+//        $A = [4,2,2,5,1,5,8];
         $A = [-3, -5, -8, -4, -10];
 
         $minAverage = solution($A);

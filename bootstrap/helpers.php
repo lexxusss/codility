@@ -17,6 +17,8 @@ if (!function_exists('dd')) {
             $dd->dump($var);
         }
 
+        dd_dumpHeader($callstack);
+
         die;
     }
 }
@@ -32,6 +34,8 @@ if (!function_exists('_d')) {
         foreach (func_get_args() as $var) {
             $dd->dump($var);
         }
+
+        dd_dumpHeader($callstack);
     }
 }
 

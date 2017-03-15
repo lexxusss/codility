@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Lessons;
 
+use App\Http\Controllers\Controller;
 
 class CountingElementsController extends Controller
 {
