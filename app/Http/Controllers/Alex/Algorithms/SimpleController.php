@@ -7,6 +7,22 @@ use App\Http\Controllers\Controller;
 
 class SimpleController extends Controller
 {
+    public function index()
+    {
+        $N = 30;
+        $A = [41,23,44,58,6,30,45,65,12,875,45,54,33];
+        $A = range(1, 999999);
+
+        sort($A);
+
+//        $this->debugCallback('factorial_recursive', $N);
+//        $this->debugCallback('factorial_loop', $N);
+//        $this->debugCallback('fibonacci_recursive', $N);
+//        $this->debugCallback('fibonacci_loop', $N);
+        $this->debugCallback('binary_search_recursive', [$A, $N, 0, count($A) - 1]);
+        $this->debugCallback('binary_search_loop', [$A, $N]);
+    }
+
     public function getMicrotimeDiff($tt2, $tt1)
     {
         list($m2, $s2) = explode(' ', $tt2);
@@ -23,22 +39,20 @@ class SimpleController extends Controller
         return $secondsDiff + $millisecondsDiff;
     }
 
-    public function index()
-    {
-        $N = 30;
-
-        $this->debugCallback('factorial_recursive', $N);
-        $this->debugCallback('factorial_loop', $N);
-        $this->debugCallback('fibonacci_recursive', $N);
-        $this->debugCallback('fibonacci_loop', $N);
-    }
-
     protected function debugCallback($callback, $parameter)
     {
+        if (is_array($parameter)) {
+            $func = 'call_user_func_array';
+            $parameterToString = 'Array of params';
+        } else {
+            $func = 'call_user_func';
+            $parameterToString = $parameter;
+        }
+
         $tt1 = microtime();
-        $result = call_user_func([$this, $callback], $parameter);
+        $result = $func([$this, $callback], $parameter);
         $time = $this->getMicrotimeDiff(microtime(), $tt1);
-        _d("$callback of $parameter: $result", "Time in milliseconds: $time");
+        _d("$callback of $parameterToString: $result", "Time in milliseconds: $time");
     }
 
     protected function factorial_recursive($N)
@@ -93,5 +107,40 @@ class SimpleController extends Controller
         }
 
         return $current;
+    }
+
+    protected function binary_search_recursive($A, $N, $left, $right)
+    {
+        if ($left > $right) return -1;
+
+        $mid = ($left + $right) >> 1;
+
+        if ($A[$mid] == $N) {
+            return $mid;
+        } elseif ($A[$mid] > $N) {
+            return $this->binary_search_recursive($A, $N, $left, $mid - 1);
+        }
+
+        return $this->binary_search_recursive($A, $N, $left + 1, $right);
+    }
+
+    protected function binary_search_loop($A, $N)
+    {
+        $left = 0;
+        $right = count($A)-1;
+
+        while ($left <= $right) {
+            $mid = ($left + $right) >> 1;
+
+            if ($A[$mid] == $N) {
+                return $mid;
+            } elseif ($A[$mid] > $N) {
+                $right = $mid - 1;
+            } elseif ($A[$mid] < $N) {
+                $left = $mid + 1;
+            }
+        }
+
+        return -1;
     }
 }
