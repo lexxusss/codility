@@ -39,6 +39,9 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/max_product_of_three', 'SortingController@max_product_of_three');
     $route->get('/triangle', 'SortingController@triangle');
     $route->get('/number_of_disc_intersections', 'SortingController@number_of_disc_intersections');
+
+    $route->get('/brackets', 'StackAndQueuesController@brackets');
+    $route->get('/fish', 'StackAndQueuesController@fish');
 });
 
 Route::group(['namespace' => 'Alex'], function (Router $route) {
