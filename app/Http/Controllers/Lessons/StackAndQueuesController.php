@@ -146,83 +146,101 @@ class StackAndQueuesController extends Controller
      */
     public function fish()
     {
-        function getLastDownStreamIndex($from, $B, $DOWN_STREAM) {
-            for ($lastDownStream = $from; $lastDownStream > 0 && $B[$lastDownStream] != $DOWN_STREAM; $lastDownStream--);
+        function getCurrentFishIndex($from, $B, $UP_STREAM) {
+            for ($currentFishIndex = $from; $currentFishIndex >= 0 && $B[$currentFishIndex] === $UP_STREAM; $currentFishIndex--);
 
-            return $lastDownStream;
+            return $currentFishIndex;
         }
 
-        function exchangeTwoFishes(&$A, &$B, &$currentFishIndex, &$nextFishIndex) {
-            $buff = $A[$currentFishIndex];
-            $A[$currentFishIndex] = $A[$nextFishIndex];
-            $A[$nextFishIndex] = $buff;
+        function getNextFishIndex($from, $B, $length, $UP_STREAM) {
+            for ($nextFishIndex = $from; $nextFishIndex < $length && $B[$nextFishIndex] !== $UP_STREAM; $nextFishIndex++);
 
-            $buff = $B[$currentFishIndex];
-            $B[$currentFishIndex] = $B[$nextFishIndex];
-            $B[$nextFishIndex] = $buff;
+            return $nextFishIndex;
+        }
 
-            $buff = $currentFishIndex;
-            $currentFishIndex = $nextFishIndex;
-            $nextFishIndex = $buff;
+
+        function toString($A, $B, $O = []) {
+            $corpse = 'X';
+            $S = '';
+
+            foreach ($A as $item) {
+                $S .= !is_null($item) ? "$item . " : $corpse . " . ";
+            }
+            $S = substr($S, 0, -3) . "\r\n";
+
+            foreach ($B as $item) {
+                $S .= !is_null($item) ? "$item . " : $corpse . " . ";
+            }
+            $S = substr($S, 0, -3) . "\r\n" . "\r\n";
+
+            if ($O) {
+                foreach ($O as $item) {
+                    $S .= !is_null($item) ? "$item . " : $corpse . " . ";
+                }
+                $S = substr($S, 0, -3) . "\r\n";
+            }
+
+            return $S;
         }
 
         function solution ($A, $B) {
-            $DOWN_STREAM = 1;
+            $UP_STREAM = 0;
 
-            $length = count($A);
+            $survive = $length = count($A);
 
-            $currentFishIndex = getLastDownStreamIndex($length - 1, $B, $DOWN_STREAM);
+            $currentFishIndex = getCurrentFishIndex($length - 1, $B, $UP_STREAM);
             $nextFishIndex = $currentFishIndex + 1;
 
-            $nextFishStream = $B[$nextFishIndex];
+            $eaten = 0;
+            while ($currentFishIndex >= 0) {
+                _d($currentFishIndex, toString($A, $B), $nextFishIndex);
 
-//            dd($l, $r, $currentFishIndex);
-            # (eat OR cross OR will be eaten by) the next upstream fish UNTIL (it meats downstream fish OR there will not more fishes)
-            while ($nextFishStream != $DOWN_STREAM && $nextFishIndex < $length) {
-                if ($nextFishStream == $DOWN_STREAM) {
-                    $currentFishIndex = getLastDownStreamIndex($currentFishIndex, $B, $DOWN_STREAM);
-                    $nextFishIndex = $currentFishIndex + 1;
+                if ($nextFishIndex >= $length) {
+                    $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
+                    $nextFishIndex = getNextFishIndex($currentFishIndex + 1, $B, $length, $UP_STREAM);
                     continue;
                 }
 
-                if (!array_key_exists($currentFishIndex, $A)) dd($currentFishIndex);
                 $currentFishSize = $A[$currentFishIndex];
                 $nextFishSize = $A[$nextFishIndex];
+                if ($currentFishSize > $nextFishSize) { # if it eats upstream fish
+                    $B[$nextFishIndex] = null;
+                    $survive--;
+                    $eaten++;
 
-                if ($currentFishSize > $nextFishSize) {
-                    # if it eats upstream fish -> remove upstream fish and compare further
-                    array_splice($A, $nextFishIndex, 1);
-                    array_splice($B, $nextFishIndex, 1);
+                    $nextFishIndex = getNextFishIndex($nextFishIndex + 1, $B, $length, $UP_STREAM);
+                } else { # if it will be eaten
+                    $B[$currentFishIndex] = null;
+                    $survive--;
+                    $eaten++;
 
-                    $nextFishIndex++;
-                    $length--;
-                } elseif ($currentFishSize < $nextFishSize) {
-                    # if it will be eaten -> launch new comparison loop with downstream fish and new upstream fish
-                    array_splice($A, $currentFishIndex, 1);
-                    array_splice($B, $currentFishIndex, 1);
-
-                    $currentFishIndex = getLastDownStreamIndex($currentFishIndex, $B, $DOWN_STREAM);
-                    $nextFishIndex = $currentFishIndex + 1;
-                } else {
-                    # if it will be crossing through the downstream fish -> exchange two fishes
-                    exchangeTwoFishes($A, $B, $currentFishIndex, $nextFishIndex);
+                    $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
+                    $nextFishIndex = getNextFishIndex($currentFishIndex + 1, $B, $length, $UP_STREAM);
                 }
             }
 
-            dd($l, $r, $length);
+            _d($currentFishIndex, toString($A, $B), $nextFishIndex);
 
-            return $alive;
+            return $survive;
         }
 
 
-        $A = [1,2,3,4,5,6,7,8];
-        $B = [0,0,0,1,0,1,1,1];
+//        $A = [1,2,3,4,5,6,7,8];
+//        $B = [0,0,0,1,0,1,1,1];
 
-        $A = [4, 3, 2, 1, 5];
-        $B = [0, 1, 0, 0, 0];
+//        $A = [4, 3, 2, 1, 5];
+//        $B = [0, 1, 0, 0, 0];
 
-//        $A = [1,4,3,4,4,3,2,1,2];
+//        $A = [1,4,3,4,4,3,2,4,2];
 //        $B = [1,1,1,1,0,1,0,0,1];
+
+        $A = [3,4,5,6,3,1,8,2,7];
+        $B = [1,1,1,1,0,1,0,0,1];
+
+//        $count = 100;
+//        $A = array_merge(array_fill(0, $count / 2, 0), array_fill(0, $count / 2, 1));
+//        $B = range(1, $count);
+//        shuffle($B);
 
         $alive = solution($A, $B);
 

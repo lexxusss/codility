@@ -40,7 +40,7 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/triangle', 'SortingController@triangle');
     $route->get('/number_of_disc_intersections', 'SortingController@number_of_disc_intersections');
 
-    $route->get('/brackets', 'StackAndQueuesController@brackets');
+    $route->get('/ ', 'StackAndQueuesController@brackets');
     $route->get('/fish', 'StackAndQueuesController@fish');
 });
 
