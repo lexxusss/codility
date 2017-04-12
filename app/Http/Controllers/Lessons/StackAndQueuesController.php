@@ -152,8 +152,17 @@ class StackAndQueuesController extends Controller
             return $currentFishIndex;
         }
 
-        function getNextFishIndex($from, $B, $length, $UP_STREAM) {
-            for ($nextFishIndex = $from; $nextFishIndex < $length && $B[$nextFishIndex] !== $UP_STREAM; $nextFishIndex++);
+        function getNextFishIndex($nextFishIndex, $B, $eaten) {
+//            if ($eaten == 2) dd($nextFishIndex, $B);
+            $nextFishIndex++;
+
+            if (array_key_exists($nextFishIndex, $B) && is_null($B[$nextFishIndex])) {
+                $nextFishIndex += $eaten - 1;
+            }
+            if (is_null($B[$nextFishIndex])) {
+                $nextFishIndex++;
+            }
+
 
             return $nextFishIndex;
         }
@@ -192,30 +201,30 @@ class StackAndQueuesController extends Controller
             $nextFishIndex = $currentFishIndex + 1;
 
             $eaten = 0;
-            while ($currentFishIndex >= 0) {
-                _d($currentFishIndex, toString($A, $B), $nextFishIndex);
-
+            while ($currentFishIndex > -1) {
+                _d($currentFishIndex, toString($A, $B), $nextFishIndex, "survive: $survive");
                 if ($nextFishIndex >= $length) {
                     $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
-                    $nextFishIndex = getNextFishIndex($currentFishIndex + 1, $B, $length, $UP_STREAM);
+                    $nextFishIndex = getNextFishIndex($currentFishIndex, $B, $eaten);
                     continue;
                 }
 
                 $currentFishSize = $A[$currentFishIndex];
                 $nextFishSize = $A[$nextFishIndex];
+
                 if ($currentFishSize > $nextFishSize) { # if it eats upstream fish
                     $B[$nextFishIndex] = null;
                     $survive--;
                     $eaten++;
 
-                    $nextFishIndex = getNextFishIndex($nextFishIndex + 1, $B, $length, $UP_STREAM);
+                    $nextFishIndex = getNextFishIndex($nextFishIndex, $B, $eaten);
                 } else { # if it will be eaten
                     $B[$currentFishIndex] = null;
                     $survive--;
                     $eaten++;
 
                     $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
-                    $nextFishIndex = getNextFishIndex($currentFishIndex + 1, $B, $length, $UP_STREAM);
+                    $nextFishIndex = getNextFishIndex($currentFishIndex, $B, $eaten);
                 }
             }
 
@@ -228,14 +237,14 @@ class StackAndQueuesController extends Controller
 //        $A = [1,2,3,4,5,6,7,8];
 //        $B = [0,0,0,1,0,1,1,1];
 
-//        $A = [4, 3, 2, 1, 5];
-//        $B = [0, 1, 0, 0, 0];
+        $A = [4, 3, 2, 1, 5];
+        $B = [0, 1, 0, 0, 0];
 
 //        $A = [1,4,3,4,4,3,2,4,2];
 //        $B = [1,1,1,1,0,1,0,0,1];
 
-        $A = [3,4,5,6,3,1,8,2,7];
-        $B = [1,1,1,1,0,1,0,0,1];
+//        $A = [3,4,5,6,3,1,8,2,7];
+//        $B = [1,1,1,1,0,1,0,0,1];
 
 //        $count = 100;
 //        $A = array_merge(array_fill(0, $count / 2, 0), array_fill(0, $count / 2, 1));
