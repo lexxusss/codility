@@ -194,6 +194,7 @@ class StackAndQueuesController extends Controller
 
         function solution ($A, $B) {
             $UP_STREAM = 0;
+            $DOWN_STREAM = 1;
 
             $survive = $length = count($A);
 
@@ -203,7 +204,7 @@ class StackAndQueuesController extends Controller
             $eaten = 0;
             while ($currentFishIndex > -1) {
                 _d($currentFishIndex, toString($A, $B), $nextFishIndex, "survive: $survive");
-                if ($nextFishIndex >= $length) {
+                if ($nextFishIndex >= $length || $B[$nextFishIndex] == $DOWN_STREAM) {
                     $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
                     $nextFishIndex = getNextFishIndex($currentFishIndex, $B, $eaten);
                     continue;
@@ -237,14 +238,11 @@ class StackAndQueuesController extends Controller
 //        $A = [1,2,3,4,5,6,7,8];
 //        $B = [0,0,0,1,0,1,1,1];
 
-        $A = [4, 3, 2, 1, 5];
-        $B = [0, 1, 0, 0, 0];
+//        $A = [4, 3, 2, 1, 5];
+//        $B = [0, 1, 0, 0, 0];
 
-//        $A = [1,4,3,4,4,3,2,4,2];
-//        $B = [1,1,1,1,0,1,0,0,1];
-
-//        $A = [3,4,5,6,3,1,8,2,7];
-//        $B = [1,1,1,1,0,1,0,0,1];
+        $A = [3,4,5,6,3,1,8,2,7];
+        $B = [1,1,1,1,0,1,0,0,1];
 
 //        $count = 100;
 //        $A = array_merge(array_fill(0, $count / 2, 0), array_fill(0, $count / 2, 1));
