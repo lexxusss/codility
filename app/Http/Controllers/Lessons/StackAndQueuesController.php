@@ -146,92 +146,41 @@ class StackAndQueuesController extends Controller
      */
     public function fish()
     {
-        function getCurrentFishIndex($from, $B, $UP_STREAM) {
-            for ($currentFishIndex = $from; $currentFishIndex >= 0 && $B[$currentFishIndex] === $UP_STREAM; $currentFishIndex--);
-
-            return $currentFishIndex;
-        }
-
-        function getNextFishIndex($nextFishIndex, $B, $eaten) {
-//            if ($eaten == 2) dd($nextFishIndex, $B);
-            $nextFishIndex++;
-
-            if (array_key_exists($nextFishIndex, $B) && is_null($B[$nextFishIndex])) {
-                $nextFishIndex += $eaten - 1;
-            }
-            if (is_null($B[$nextFishIndex])) {
-                $nextFishIndex++;
-            }
-
-
-            return $nextFishIndex;
-        }
-
-
-        function toString($A, $B, $O = []) {
-            $corpse = 'X';
-            $S = '';
-
-            foreach ($A as $item) {
-                $S .= !is_null($item) ? "$item . " : $corpse . " . ";
-            }
-            $S = substr($S, 0, -3) . "\r\n";
-
-            foreach ($B as $item) {
-                $S .= !is_null($item) ? "$item . " : $corpse . " . ";
-            }
-            $S = substr($S, 0, -3) . "\r\n" . "\r\n";
-
-            if ($O) {
-                foreach ($O as $item) {
-                    $S .= !is_null($item) ? "$item . " : $corpse . " . ";
-                }
-                $S = substr($S, 0, -3) . "\r\n";
-            }
-
-            return $S;
-        }
-
         function solution ($A, $B) {
-            $UP_STREAM = 0;
+            $length = count($A);
             $DOWN_STREAM = 1;
 
-            $survive = $length = count($A);
+            $down_streams = [];
+            $down_streams_count = 0;
+            $up_streams_count = 0;
 
-            $currentFishIndex = getCurrentFishIndex($length - 1, $B, $UP_STREAM);
-            $nextFishIndex = $currentFishIndex + 1;
+            for ($i = 0; $i < $length; $i++) {
+                $direction = $B[$i];
 
-            $eaten = 0;
-            while ($currentFishIndex > -1) {
-                _d($currentFishIndex, toString($A, $B), $nextFishIndex, "survive: $survive");
-                if ($nextFishIndex >= $length || $B[$nextFishIndex] == $DOWN_STREAM) {
-                    $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
-                    $nextFishIndex = getNextFishIndex($currentFishIndex, $B, $eaten);
-                    continue;
-                }
+                if ($direction == $DOWN_STREAM) {
+                    array_push($down_streams, $i);
+                    $down_streams_count++;
+                } else {
+                    $upStreamSize = $A[$i];
+                    $up_streams_count++;
 
-                $currentFishSize = $A[$currentFishIndex];
-                $nextFishSize = $A[$nextFishIndex];
+                    while ($down_streams_count > 0) {
+                        $downStreamIndex = array_pop($down_streams);
+                        $down_streams_count--;
+                        $downStreamSize = $A[$downStreamIndex];
 
-                if ($currentFishSize > $nextFishSize) { # if it eats upstream fish
-                    $B[$nextFishIndex] = null;
-                    $survive--;
-                    $eaten++;
+                        if ($upStreamSize < $downStreamSize) {
+                            array_push($down_streams, $downStreamIndex);
+                            $down_streams_count++;
+                            $up_streams_count--;
 
-                    $nextFishIndex = getNextFishIndex($nextFishIndex, $B, $eaten);
-                } else { # if it will be eaten
-                    $B[$currentFishIndex] = null;
-                    $survive--;
-                    $eaten++;
-
-                    $currentFishIndex = getCurrentFishIndex($currentFishIndex - 1, $B, $UP_STREAM);
-                    $nextFishIndex = getNextFishIndex($currentFishIndex, $B, $eaten);
+                            break;
+                        }
+                    }
                 }
             }
 
-            _d($currentFishIndex, toString($A, $B), $nextFishIndex);
-
-            return $survive;
+            return $up_streams_count + $down_streams_count;
         }
 
 
@@ -241,13 +190,8 @@ class StackAndQueuesController extends Controller
 //        $A = [4, 3, 2, 1, 5];
 //        $B = [0, 1, 0, 0, 0];
 
-        $A = [3,4,5,6,3,1,8,2,7];
-        $B = [1,1,1,1,0,1,0,0,1];
-
-//        $count = 100;
-//        $A = array_merge(array_fill(0, $count / 2, 0), array_fill(0, $count / 2, 1));
-//        $B = range(1, $count);
-//        shuffle($B);
+            $A = [3,4,5,6,3,1,8,2,7];
+            $B = [1,1,1,1,0,1,0,0,1];
 
         $alive = solution($A, $B);
 
