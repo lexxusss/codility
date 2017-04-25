@@ -43,6 +43,7 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/brackets', 'StackAndQueuesController@brackets');
     $route->get('/fish', 'StackAndQueuesController@fish');
     $route->get('/nesting', 'StackAndQueuesController@nesting');
+    $route->get('/stone_wall', 'StackAndQueuesController@stone_wall');
 });
 
 Route::group(['namespace' => 'Alex'], function (Router $route) {
