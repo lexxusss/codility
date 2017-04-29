@@ -14,9 +14,7 @@ use \Illuminate\Routing\Router;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@index');
 
 Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/cyclic_rotation', 'ArraysController@cyclic_rotation');
@@ -45,6 +43,7 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/nesting', 'StackAndQueuesController@nesting');
     $route->get('/stone_wall', 'StackAndQueuesController@stone_wall');
 
+    $route->get('/dominator', 'LeaderController@dominator');
     $route->get('/equi_leader', 'LeaderController@equi_leader');
 });
 
