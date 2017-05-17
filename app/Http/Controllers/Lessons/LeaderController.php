@@ -62,15 +62,102 @@ class LeaderController extends Controller
      */
     public function equi_leader()
     {
-        function isLeader($countOfNumber, $totalNumbers) {
-            return $countOfNumber > ($totalNumbers / 2);
-        }
-
         function solution($A) {
-            
+            $length = count($A);
+            $last = $length - 1;
+            $equis = [];
 
-            return 1;
+            //from right
+            $rightCandidatesStack = [];
+            $rightDominatorsKeys = [];
+            $dominators = [];
+
+            if ($length > 1) {
+                for ($i = $last; $i > 0; $i--) {
+                    $itemRight = $A[$i];
+                    $dominators[$itemRight][] = 1;
+
+                    if (!count($rightCandidatesStack)) {
+                        array_push($rightCandidatesStack, $itemRight);
+                    } else {
+                        $dominator = array_pop($rightCandidatesStack);
+                        if ($dominator == $itemRight) {
+                            array_push($rightCandidatesStack, $dominator);
+                            array_push($rightCandidatesStack, $itemRight);
+                        }
+                    }
+
+                    if (count($rightCandidatesStack)) {
+                        $dominator = array_pop($rightCandidatesStack);
+                        array_push($rightCandidatesStack, $dominator);
+
+                        $countItem = count($dominators[$dominator]);
+                        $countRightTotal = $length - $i;
+                        if ($countItem > ($countRightTotal / 2)) {
+                            $rightDominatorsKeys[$i - 1] = $dominator;
+                        }
+                    }
+                }
+            }
+
+
+            // from left
+            $leftCandidatesStack = [];
+            $leftDominatorsKeys = [];
+            $dominators = [];
+
+            for ($i = 0; $i < $length; $i++) {
+                $itemLeft = $A[$i];
+                $dominators[$itemLeft][] = 1;
+
+                if (!count($leftCandidatesStack)) {
+                    array_push($leftCandidatesStack, $itemLeft);
+                } else {
+                    $dominator = array_pop($leftCandidatesStack);
+                    array_push($leftCandidatesStack, $dominator);
+
+                    if ($dominator == $itemLeft) {
+                        array_push($leftCandidatesStack, $itemLeft);
+                    }
+                }
+
+                if (count($leftCandidatesStack)) {
+                    $dominator = array_pop($leftCandidatesStack);
+                    array_push($leftCandidatesStack, $dominator);
+
+                    $countItem = count($dominators[$dominator]);
+                    $countLeftTotal = $i + 1;
+                    if ($countItem > ($countLeftTotal / 2)) {
+                        $leftDominatorsKeys[$i] = $dominator;
+                    }
+                }
+            }
+
+            // count equis
+            if (count($leftDominatorsKeys) < count($rightDominatorsKeys)) {
+                foreach ($leftDominatorsKeys as $dominatorKey => $dominator) {
+                    if (array_key_exists($dominatorKey, $rightDominatorsKeys) && $rightDominatorsKeys[$dominatorKey] == $dominator) {
+                        array_push($equis, $dominatorKey);
+                    }
+                }
+            } else {
+                foreach ($rightDominatorsKeys as $dominatorKey => $dominator) {
+                    if (array_key_exists($dominatorKey, $leftDominatorsKeys) && $leftDominatorsKeys[$dominatorKey] == $dominator) {
+                        array_push($equis, $dominatorKey);
+                    }
+                }
+            }
+
+            return count($equis);
         }
+
+
+
+//            _d("-------------");
+//        _d($A);
+//        _d($leftDominatorsKeys);
+//        _d($rightDominatorsKeys);
+//        _d($equis);
 
 //        $A = [4,3,4,4,4,2];
         $A = [4, 4, 2, 5, 3, 4, 4, 4];
@@ -121,28 +208,26 @@ class LeaderController extends Controller
     public function dominator()
     {
         function solution($A) {
-            $stack = [];
-            $keysStack = [];
-
+            $stackSize = 0;
+            $lastStackKey = -1;
+            $lastStackValue = null;
             foreach ($A as $key => $item) {
-                $lastStackItem = array_pop($stack);
-                $lastStackKey = array_pop($keysStack);
-
-                if ($lastStackItem === null) {
-                    array_push($stack, $item);
-                    array_push($keysStack, $key);
-                } elseif ($item == $lastStackItem) {
-                    array_push($stack, $lastStackItem);
-                    array_push($keysStack, $lastStackKey);
-
-                    array_push($stack, $item);
-                    array_push($keysStack, $key);
+                if ($stackSize == 0) {
+                    $stackSize++;
+                    $lastStackValue = $item;
+                    $lastStackKey = $key;
+                } else {
+                    if ($lastStackValue != $item) {
+                        $stackSize--;
+                    } else {
+                        $stackSize++;
+                    }
                 }
             }
 
-            $candidate = array_pop($stack);
-            $candidateKey = array_pop($keysStack);
-            if ($candidate) {
+            if ($stackSize) {
+                $candidate = $lastStackValue;
+
                 $count = 0;
                 foreach ($A as $item) {
                     if ($item == $candidate) {
@@ -151,15 +236,17 @@ class LeaderController extends Controller
                 }
 
                 if ($count > count($A) / 2) {
-                    return $candidateKey;
+                    return $lastStackKey;
                 }
+
             }
 
             return -1;
         }
 
 //        $A = [3,4,3,2,3,-1,3,3];
-        $A = [2, 1, 1, 1, 3];
+//        $A = [2, 1, 1, 1, 3];
+        $A = [0, 0];
 
         $dominator = solution($A);
 
