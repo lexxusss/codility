@@ -65,99 +65,55 @@ class LeaderController extends Controller
         function solution($A) {
             $length = count($A);
             $last = $length - 1;
-            $equis = [];
 
-            //from right
-            $rightCandidatesStack = [];
-            $rightDominatorsKeys = [];
-            $dominators = [];
+            // find leader
+            $counter = 0;
+            $leaders = [];
 
-            if ($length > 1) {
-                for ($i = $last; $i > 0; $i--) {
-                    $itemRight = $A[$i];
-                    $dominators[$itemRight][] = 1;
+            $leader = $A[0];
+            $leaders[$leader][0] = 1;
 
-                    if (!count($rightCandidatesStack)) {
-                        array_push($rightCandidatesStack, $itemRight);
-                    } else {
-                        $dominator = array_pop($rightCandidatesStack);
-                        if ($dominator == $itemRight) {
-                            array_push($rightCandidatesStack, $dominator);
-                            array_push($rightCandidatesStack, $itemRight);
-                        }
-                    }
+            for ($i = 1; $i < $length; $i++) {
+                $item = $A[$i];
+                $leaders[$item][$i] = 1;
 
-                    if (count($rightCandidatesStack)) {
-                        $dominator = array_pop($rightCandidatesStack);
-                        array_push($rightCandidatesStack, $dominator);
-
-                        $countItem = count($dominators[$dominator]);
-                        $countRightTotal = $length - $i;
-                        if ($countItem > ($countRightTotal / 2)) {
-                            $rightDominatorsKeys[$i - 1] = $dominator;
-                        }
-                    }
-                }
-            }
-
-
-            // from left
-            $leftCandidatesStack = [];
-            $leftDominatorsKeys = [];
-            $dominators = [];
-
-            for ($i = 0; $i < $length; $i++) {
-                $itemLeft = $A[$i];
-                $dominators[$itemLeft][] = 1;
-
-                if (!count($leftCandidatesStack)) {
-                    array_push($leftCandidatesStack, $itemLeft);
+                if ($counter == 0) {
+                    $counter++;
+                    $leader = $item;
                 } else {
-                    $dominator = array_pop($leftCandidatesStack);
-                    array_push($leftCandidatesStack, $dominator);
-
-                    if ($dominator == $itemLeft) {
-                        array_push($leftCandidatesStack, $itemLeft);
-                    }
-                }
-
-                if (count($leftCandidatesStack)) {
-                    $dominator = array_pop($leftCandidatesStack);
-                    array_push($leftCandidatesStack, $dominator);
-
-                    $countItem = count($dominators[$dominator]);
-                    $countLeftTotal = $i + 1;
-                    if ($countItem > ($countLeftTotal / 2)) {
-                        $leftDominatorsKeys[$i] = $dominator;
+                    if ($item == $leader) {
+                        $counter++;
+                    } else {
+                        $counter--;
                     }
                 }
             }
 
-            // count equis
-            if (count($leftDominatorsKeys) < count($rightDominatorsKeys)) {
-                foreach ($leftDominatorsKeys as $dominatorKey => $dominator) {
-                    if (array_key_exists($dominatorKey, $rightDominatorsKeys) && $rightDominatorsKeys[$dominatorKey] == $dominator) {
-                        array_push($equis, $dominatorKey);
+            // define if it is a leader
+            $totalCountLeader = count($leaders[$leader]);
+            if ($counter && $totalCountLeader > ($length / 2)) {
+                // find equis
+                $equisCount = 0;
+                $leftCountLeader = 0;
+                foreach ($A as $key => $item) {
+                    if ($item == $leader) {
+                        $leftCountLeader++;
+                    }
+
+                    // if it is equi
+                    if ($leftCountLeader > ($key + 1) / 2) {
+                        $rightCountLeader = $totalCountLeader - $leftCountLeader;
+                        if ($rightCountLeader > ($last - $key) / 2) {
+                            $equisCount++;
+                        }
                     }
                 }
-            } else {
-                foreach ($rightDominatorsKeys as $dominatorKey => $dominator) {
-                    if (array_key_exists($dominatorKey, $leftDominatorsKeys) && $leftDominatorsKeys[$dominatorKey] == $dominator) {
-                        array_push($equis, $dominatorKey);
-                    }
-                }
+
+                return $equisCount;
             }
 
-            return count($equis);
+            return 0;
         }
-
-
-
-//            _d("-------------");
-//        _d($A);
-//        _d($leftDominatorsKeys);
-//        _d($rightDominatorsKeys);
-//        _d($equis);
 
 //        $A = [4,3,4,4,4,2];
         $A = [4, 4, 2, 5, 3, 4, 4, 4];
