@@ -137,6 +137,67 @@ class PrefixSumsController extends Controller
         dd($pairs);
     }
 
+    public function genomic_range_query()
+    {
+        function get_appears($S, $numbers) {
+            $appears = [];
+            $count = array_fill($numbers['A'], count($numbers),0);
+            for ($i = 0; $i < strlen($S); $i++) {
+                $factor = $numbers[$S[$i]];
+                $count[$factor]++;
+                $appears[$i] = $count;
+            }
+
+            return $appears;
+        }
+
+        function get_min_from_appears($min, $max, $appears, $S, $numbers) {
+            if ($min == $max) {
+                return $numbers[$S[$max]];
+            }
+
+            if (array_key_exists($min  - 1, $appears)) {
+                return key(array_diff_assoc($appears[$max], $appears[$min-1]));
+            }
+
+            return get_first_key_with_non_zero_value($appears[$max]);
+        }
+
+        function get_first_key_with_non_zero_value($A) {
+            foreach ($A as $k => $a) {
+                if (!empty($a)) {
+                    return $k;
+                }
+            }
+
+            return null;
+        }
+
+        function solution($S, $P, $Q) {
+            $numbers = [
+                'A' => 1,
+                'C' => 2,
+                'G' => 3,
+                'T' => 4,
+            ];
+
+            $appears = get_appears($S, $numbers);
+
+            $mins = [];
+            foreach ($P as $k => $min) {
+                $mins[] = get_min_from_appears($min, $Q[$k], $appears, $S, $numbers);
+            }
+
+            return $mins;
+        }
+
+//        list($S, $P, $Q) = ['CAGCCTA', [2,5,0], [4,5,6]];
+//        list($S, $P, $Q) = ['C', [0], [0]];
+        list($S, $P, $Q) = ['GT', [0, 0, 1], [0, 1, 1]];
+
+        dd(solution($S, $P, $Q));
+    }
+
     /**
      *
 
@@ -196,7 +257,7 @@ class PrefixSumsController extends Controller
     Elements of input arrays can be modified.
 
      */
-    public function genomic_range_query()
+    public function genomic_range_query_()
     {
         function getMin($minI, $maxI, $appears, $S) {
             if ($minI != $maxI) {
