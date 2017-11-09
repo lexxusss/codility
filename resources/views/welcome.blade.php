@@ -63,6 +63,8 @@
                 margin-bottom: 30px;
             }
         </style>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     </head>
     <body>
         <div class="flex-center position-ref full-height">
@@ -80,6 +82,14 @@
             <div class="content">
                 <div class="title m-b-md">
                     Laravel
+
+                    <script>
+                        function dd() {
+                            for (let i in arguments) {
+                                console.log(arguments[i]);
+                            }
+                        }
+                    </script>
                 </div>
 
                 <div class="links">

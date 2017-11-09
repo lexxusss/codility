@@ -13,6 +13,7 @@ use \Illuminate\Routing\Router;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::post('/test', 'HomeController@test');
 
 Route::get('/', 'HomeController@index');
 
@@ -48,7 +49,15 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
 
     $route->get('/dominator', 'LeaderController@dominator');
     $route->get('/equi_leader', 'LeaderController@equi_leader');
+
+    $route->get('/max_slice_problem', 'MaximumSliceProblemController@index');
+    $route->get('/max_profit', 'MaximumSliceProblemController@max_profit');
+
 });
+
+Route::get('/task1', 'GulfTalentController@task1');
+Route::get('/task2', 'GulfTalentController@task2');
+Route::get('/demo', 'GulfTalentController@demo');
 
 Route::group(['namespace' => 'Alex'], function (Router $route) {
     $route->group(['namespace' => 'Algorithms'], function (Router $route) {
