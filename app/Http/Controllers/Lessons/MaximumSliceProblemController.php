@@ -84,130 +84,6 @@ class MaximumSliceProblemController extends Controller
         dd(solution($A));
     }
 
-    /**
-     *
-
-    A non-empty zero-indexed array A consisting of N integers is given.
-
-    A triplet (X, Y, Z), such that 0 ≤ X < Y < Z < N, is called a double slice.
-
-    The sum of double slice (X, Y, Z) is the total of A[X + 1] + A[X + 2] + ... + A[Y − 1] + A[Y + 1] + A[Y + 2] + ... + A[Z − 1].
-
-    For example, array A such that:
-    A[0] = 3
-    A[1] = 2
-    A[2] = 6
-    A[3] = -1
-    A[4] = 4
-    A[5] = 5
-    A[6] = -1
-    A[7] = 2
-
-    contains the following example double slices:
-
-    double slice (0, 3, 6), sum is 2 + 6 + 4 + 5 = 17,
-    double slice (0, 3, 7), sum is 2 + 6 + 4 + 5 − 1 = 16,
-    double slice (3, 4, 5), sum is 0.
-
-    The goal is to find the maximal sum of any double slice.
-
-    Write a function:
-
-    function solution($A);
-
-    that, given a non-empty zero-indexed array A consisting of N integers, returns the maximal sum of any double slice.
-
-    For example, given:
-    A[0] = 3
-    A[1] = 2
-    A[2] = 6
-    A[3] = -1
-    A[4] = 4
-    A[5] = 5
-    A[6] = -1
-    A[7] = 2
-
-    the function should return 17, because no double slice of array A has a sum of greater than 17.
-
-    Assume that:
-
-    N is an integer within the range [3..100,000];
-    each element of array A is an integer within the range [−10,000..10,000].
-
-    Complexity:
-
-    expected worst-case time complexity is O(N);
-    expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
-
-     * SOLVED - 100%
-     */
-    public function max_double_slice_sum()
-    {
-        function getSums($A, $directionAsc = true) {
-            if (count($A) == 3) {
-                return [0];
-            }
-
-            $length = count($A);
-            $last = $length - 1;
-
-            $sums = [];
-            $sums[] = 0;
-
-            $index = $directionAsc ? 1 : $last - 1;
-            $sums[] = $sum = max(0, $A[$index]);
-            echo "$index -> $sum<br/>";
-
-            for ($i = 2; $i < $last - 1; $i++) {
-                $index = $directionAsc ? $i : $last - $i;
-                $a = $A[$index];
-
-                $sums[] = $sum = max(0, $a, $a + $sum);
-
-                echo "$index -> $sum<br/>";
-            }
-
-            echo "<br/><br/>";
-
-            return $directionAsc ? $sums : array_reverse($sums);
-        }
-
-        function solution($A) {
-            $sumsL = getSums($A);
-            $sumsR = getSums($A, false);
-
-            $size = count($sumsL);
-            $max = $sumsL[0] + $sumsR[0];
-            for ($i = 1; $i < $size; $i++) {
-                $maxL = $sumsL[$i];
-                $maxR = $sumsR[$i];
-
-                $max = max($max, $maxL + $maxR);
-            }
-
-            _d($A, $sumsL, $sumsR, $max);
-
-            return $max;
-        }
-
-        $A = [3, 2, 6, -1, 4, 5, -1, 2]; // 17
-        $max = solution($A);
-
-        $A = [5, 5, 5]; // 0
-        $max = solution($A);
-
-        $A = [5, 17, 0, 3]; // 17
-        $max = solution($A);
-
-        $A = [5, 0, 1, 0, 5]; // 1
-        $max = solution($A);
-
-        $A = [0, 10, -5, -2, 0]; // 10
-        $max = solution($A);
-
-        dd();
-    }
-
     public function index()
     {
 //        $A = [5,-7,3,5,-2,4,-1];
@@ -378,5 +254,129 @@ class MaximumSliceProblemController extends Controller
         $sum = solution($A);
 
         dd($sum);
+    }
+
+    /**
+     *
+
+    A non-empty zero-indexed array A consisting of N integers is given.
+
+    A triplet (X, Y, Z), such that 0 ≤ X < Y < Z < N, is called a double slice.
+
+    The sum of double slice (X, Y, Z) is the total of A[X + 1] + A[X + 2] + ... + A[Y − 1] + A[Y + 1] + A[Y + 2] + ... + A[Z − 1].
+
+    For example, array A such that:
+    A[0] = 3
+    A[1] = 2
+    A[2] = 6
+    A[3] = -1
+    A[4] = 4
+    A[5] = 5
+    A[6] = -1
+    A[7] = 2
+
+    contains the following example double slices:
+
+    double slice (0, 3, 6), sum is 2 + 6 + 4 + 5 = 17,
+    double slice (0, 3, 7), sum is 2 + 6 + 4 + 5 − 1 = 16,
+    double slice (3, 4, 5), sum is 0.
+
+    The goal is to find the maximal sum of any double slice.
+
+    Write a function:
+
+    function solution($A);
+
+    that, given a non-empty zero-indexed array A consisting of N integers, returns the maximal sum of any double slice.
+
+    For example, given:
+    A[0] = 3
+    A[1] = 2
+    A[2] = 6
+    A[3] = -1
+    A[4] = 4
+    A[5] = 5
+    A[6] = -1
+    A[7] = 2
+
+    the function should return 17, because no double slice of array A has a sum of greater than 17.
+
+    Assume that:
+
+    N is an integer within the range [3..100,000];
+    each element of array A is an integer within the range [−10,000..10,000].
+
+    Complexity:
+
+    expected worst-case time complexity is O(N);
+    expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
+
+     * SOLVED - 100%
+     */
+    public function max_double_slice_sum()
+    {
+        function getSums($A, $directionAsc = true) {
+            if (count($A) == 3) {
+                return [0];
+            }
+
+            $length = count($A);
+            $last = $length - 1;
+
+            $sums = [];
+            $sums[] = 0;
+
+            $index = $directionAsc ? 1 : $last - 1;
+            $sums[] = $sum = max(0, $A[$index]);
+            echo "$index -> $sum<br/>";
+
+            for ($i = 2; $i < $last - 1; $i++) {
+                $index = $directionAsc ? $i : $last - $i;
+                $a = $A[$index];
+
+                $sums[] = $sum = max(0, $a, $a + $sum);
+
+                echo "$index -> $sum<br/>";
+            }
+
+            echo "<br/><br/>";
+
+            return $directionAsc ? $sums : array_reverse($sums);
+        }
+
+        function solution($A) {
+            $sumsL = getSums($A);
+            $sumsR = getSums($A, false);
+
+            $size = count($sumsL);
+            $max = $sumsL[0] + $sumsR[0];
+            for ($i = 1; $i < $size; $i++) {
+                $maxL = $sumsL[$i];
+                $maxR = $sumsR[$i];
+
+                $max = max($max, $maxL + $maxR);
+            }
+
+            _d($A, $sumsL, $sumsR, $max);
+
+            return $max;
+        }
+
+        $A = [3, 2, 6, -1, 4, 5, -1, 2]; // 17
+        $max = solution($A);
+
+        $A = [5, 5, 5]; // 0
+        $max = solution($A);
+
+        $A = [5, 17, 0, 3]; // 17
+        $max = solution($A);
+
+        $A = [5, 0, 1, 0, 5]; // 1
+        $max = solution($A);
+
+        $A = [0, 10, -5, -2, 0]; // 10
+        $max = solution($A);
+
+        dd();
     }
 }

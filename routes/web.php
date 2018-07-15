@@ -56,6 +56,8 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/max_double_slice_sum2', 'MaximumSliceProblemController@max_double_slice_sum2');
     $route->get('/max_slice_sum', 'MaximumSliceProblemController@max_slice_sum');
 
+    $route->get('/count_factors', 'PrimeAndCompositeNumbersController@count_factors');
+
 });
 
 Route::get('/task1', 'GulfTalentController@task1');
