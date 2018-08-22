@@ -57,6 +57,7 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/max_slice_sum', 'MaximumSliceProblemController@max_slice_sum');
 
     $route->get('/count_factors', 'PrimeAndCompositeNumbersController@count_factors');
+    $route->get('/min_perimeter_rectangle', 'PrimeAndCompositeNumbersController@min_perimeter_rectangle');
 
 });
 
