@@ -171,7 +171,7 @@ class PrimeAndCompositeNumbersController extends Controller
     each element of array A is an integer within the range [0..1,000,000,000].
      *
      *
-     * 81%
+     * 100%
      *
      *
      *
@@ -180,12 +180,14 @@ class PrimeAndCompositeNumbersController extends Controller
     public function peaks()
     {
         function findPeaks($A) {
+            $last = count($A) - 1;
             $peaks = [];
-            for ($i = 1; $i < count($A); $i++) {
+            for ($i = 1; $i < $last; $i++) {
                 $p = $A[$i - 1];
-                $v = (int) $A[$i];
-                if ($p > $v) {
-                    $peaks[] = $i - 1;
+                $v = $A[$i];
+                $n = $A[$i + 1];
+                if ($p < $v && $v > $n) {
+                    $peaks[] = $i;
                     $i++;
                 }
             }
@@ -288,6 +290,7 @@ class PrimeAndCompositeNumbersController extends Controller
         }
 
         $A = [1,2,3,"4", 3,"4",1,"4", 3,4,"6",2];
+//        $A = [0, 1000000000];
 //        $A = [1, 1, 3, 2, 1, 3, 2, 3, 2, 3, 2, 1];
 
         dd(solution($A));
