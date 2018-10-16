@@ -96,4 +96,257 @@ class PrimeAndCompositeNumbersController extends Controller
 
         dd(solution($N));
     }
+
+    /**
+     *
+
+    A non-empty array A consisting of N integers is given.
+
+    A peak is an array element which is larger than its neighbors. More precisely, it is an index P such that 0 < P < N − 1,  A[P − 1] < A[P] and A[P] > A[P + 1].
+
+    For example, the following array A:
+    A[0] = 1
+    A[1] = 2
+    A[2] = 3
+    A[3] = 4
+    A[4] = 3
+    A[5] = 4
+    A[6] = 1
+    A[7] = 2
+    A[8] = 3
+    A[9] = 4
+    A[10] = 6
+    A[11] = 2
+
+    has exactly three peaks: 3, 5, 10.
+
+    We want to divide this array into blocks containing the same number of elements. More precisely, we want to choose a number K that will yield the following blocks:
+
+    A[0], A[1], ..., A[K − 1],
+    A[K], A[K + 1], ..., A[2K − 1],
+    ...
+    A[N − K], A[N − K + 1], ..., A[N − 1].
+
+    What's more, every block should contain at least one peak. Notice that extreme elements of the blocks (for example A[K − 1] or A[K]) can also be peaks, but only if they have both neighbors (including one in an adjacent blocks).
+
+    The goal is to find the maximum number of blocks into which the array A can be divided.
+
+    Array A can be divided into blocks as follows:
+
+    one block (1, 2, 3, 4, 3, 4, 1, 2, 3, 4, 6, 2). This block contains three peaks.
+    two blocks (1, 2, 3, 4, 3, 4) and (1, 2, 3, 4, 6, 2). Every block has a peak.
+    three blocks (1, 2, 3, 4), (3, 4, 1, 2), (3, 4, 6, 2). Every block has a peak. Notice in particular that the first block (1, 2, 3, 4) has a peak at A[3], because A[2] < A[3] > A[4], even though A[4] is in the adjacent block.
+
+    However, array A cannot be divided into four blocks, (1, 2, 3), (4, 3, 4), (1, 2, 3) and (4, 6, 2), because the (1, 2, 3) blocks do not contain a peak. Notice in particular that the (4, 3, 4) block contains two peaks: A[3] and A[5].
+
+    The maximum number of blocks that array A can be divided into is three.
+
+    Write a function:
+
+    function solution($A);
+
+    that, given a non-empty array A consisting of N integers, returns the maximum number of blocks into which A can be divided.
+
+    If A cannot be divided into some number of blocks, the function should return 0.
+
+    For example, given:
+    A[0] = 1
+    A[1] = 2
+    A[2] = 3
+    A[3] = 4
+    A[4] = 3
+    A[5] = 4
+    A[6] = 1
+    A[7] = 2
+    A[8] = 3
+    A[9] = 4
+    A[10] = 6
+    A[11] = 2
+
+    the function should return 3, as explained above.
+
+    Write an efficient algorithm for the following assumptions:
+
+    N is an integer within the range [1..100,000];
+    each element of array A is an integer within the range [0..1,000,000,000].
+     *
+     *
+     * 81%
+     *
+     *
+     *
+
+     */
+    public function peaks()
+    {
+        function findPeaks($A) {
+            $peaks = [];
+            for ($i = 1; $i < count($A); $i++) {
+                $p = $A[$i - 1];
+                $v = (int) $A[$i];
+                if ($p > $v) {
+                    $peaks[] = $i - 1;
+                    $i++;
+                }
+            }
+
+            return $peaks;
+        }
+
+        function getLastChunkPeakEnds($peaks, $size) {
+            $chunkKey = 0;
+            foreach ($peaks as $peak) {
+                $peakInChunk = intval($peak / $size);
+                if ($peakInChunk > $chunkKey) {
+                    break;
+                }
+                if ($peakInChunk == $chunkKey) {
+                    $chunkKey++;
+                }
+            }
+
+            return $chunkKey;
+        }
+
+        function solution($A) {
+            $countA = count($A);
+
+            $peaks = findPeaks($A);
+            $countPeaks = count($peaks);
+
+            switch ($countPeaks) {
+                case 0:
+                case 1:
+                    return $countPeaks;
+            }
+
+            $dividers = [];
+
+            if ($countPeaks * $countPeaks >= $countA) {
+                /**
+                 * find all chunks for peaks count that give square production more than array length:
+                 * 60: ($i = divisors located right side (except 60 and 30 - impossible amount of peaks); store left divisors in $dividers)
+                 * 1 = 60
+                 * 2 = 30
+                 * 3 = 20
+                 * 4 = 15
+                 * 5 = 12
+                 * 6 = 10
+                 */
+                for ($i = $countPeaks, $production = $i * $i; $production >= $countA; $i--, $production = $i * $i) {
+                    if ($countA % $i == 0) {
+                        $divider = $countA / $i;
+
+                        if ($production != $countA) {
+                            $dividers[] = $divider;
+                        }
+
+                        $chunkKey = getLastChunkPeakEnds($peaks, $divider);
+                        if ($chunkKey == $i) {
+                            return $i;
+                        }
+                    }
+                }
+
+                /**
+                 * 60: ($dividers = divisors located left side except 1 and 2)
+                 * 1 = 60
+                 * 2 = 30
+                 * 3 = 20
+                 * 4 = 15
+                 * 5 = 12
+                 * 6 = 10
+                 */
+                foreach ($dividers as $i) {
+                    $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
+                    if ($chunkKey == $i) {
+                        return $i;
+                    }
+                }
+
+                /**
+                 * handle last dividers: 1 and 2
+                 */
+                foreach ([1, 2] as $i) {
+                    $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
+                    if ($chunkKey == $i) {
+                        return $i;
+                    }
+                }
+            } else {
+                for ($i = $countPeaks; $i > 0; $i--) {
+                    if ($countA % $i == 0) {
+                        $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
+                        if ($chunkKey == $i) {
+                            return $i;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        $A = [1,2,3,"4", 3,"4",1,"4", 3,4,"6",2];
+//        $A = [1, 1, 3, 2, 1, 3, 2, 3, 2, 3, 2, 1];
+
+        dd(solution($A));
+    }
+
+
+    /**
+     * 100% (copy-paste)
+     */
+    public function peaks2()
+    {
+        function solution($A) {
+            $n = count($A);
+            $prev = $n - 1;
+            if ($n <= 2) {
+                return 0;
+            }
+
+            $sum = array_fill(0, $n,0);
+            $last = -1;
+            $D = 0;
+
+            // fill $sum by amount of peaks on each index
+            for ($i = 1; $i < $prev; $i++) {
+                $sum[$i] = $sum[$i - 1];
+                if (($A[$i] > $A[$i - 1]) && ($A[$i] > $A[$i + 1])) {
+                    $D = max($D, $i - $last);
+                    $last = $i;
+                    ++$sum[$i];
+                }
+            }
+
+            // if no peaks
+            if (($sum[$n - 1] = $sum[$n - 2]) == 0) {
+                return 0;
+            }
+
+            $D = max($D, $n - $last);
+            for ($i = ($D >> 1) + 1; $i < $D; $i++) {
+                if ($n % $i == 0) {
+                    $last = 0;
+                    for ($j = $i; $j <= $n; $j += $i) {
+                        if ($sum[$j - 1] <= $last) {
+                            break;
+                        }
+                        $last = $sum[$j - 1];
+                    }
+                    if ($j > $n) {
+                        return $n / $i;
+                    }
+                }
+            }
+            for ($last = $D; $n % $last; ++$last);
+            return intval($n / $last);
+        }
+
+        $A = [1,2,3,"4",3,"4",1,2,3,4,"6",2];
+//        $A = [1, 1, 3, 2, 1, 3, 2, 3, 2, 3, 2, 1];
+
+        dd(solution($A));
+    }
 }
