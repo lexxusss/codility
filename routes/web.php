@@ -18,10 +18,10 @@ Route::post('/test', 'HomeController@test');
 Route::get('/', 'HomeController@index');
 
 Route::group(['namespace' => 'Lessons'], function(Router $route) {
+    $route->get('/binary_gap', 'IterationsController@binary_gap');
+
     $route->get('/cyclic_rotation', 'ArraysController@cyclic_rotation');
     $route->get('/add_occurrences_in_array', 'ArraysController@add_occurrences_in_array');
-
-    $route->get('/binary_gap', 'IterationsController@binary_gap');
 
     $route->get('/tape_equilibrium', 'TimeComplexityController@tape_equilibrium');
     $route->get('/perm_missing_elem', 'TimeComplexityController@perm_missing_elem');

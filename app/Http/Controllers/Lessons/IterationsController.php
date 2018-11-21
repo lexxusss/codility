@@ -38,20 +38,22 @@ class IterationsController extends Controller
     {
         function solution($N) {
             $binary = decbin($N);
-            $length = strlen($binary);
+            $arr = str_split($binary);
 
-            $maxCountBinaryGap = 0;
+            $gap = $maxGap = 0;
+            foreach ($arr as $key => $num) {
+                $isGap = $num == 0;
 
-            for ($i = 0, $countBinaryGap = 0; $i < $length; $i++) {
-                if ($binary[$i] == 1) {
-                    $maxCountBinaryGap = max($maxCountBinaryGap, $countBinaryGap);
-                    $countBinaryGap = 0;
+                if ($isGap) {
+                    $gap++;
                 } else {
-                    $countBinaryGap++;
+                    $maxGap = max($gap, $maxGap);
+                    $gap = 0;
+
                 }
             }
 
-            return $maxCountBinaryGap;
+            return $maxGap;
         }
 
 
