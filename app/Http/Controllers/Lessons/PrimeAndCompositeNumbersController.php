@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Lessons;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -214,74 +215,12 @@ class PrimeAndCompositeNumbersController extends Controller
             $countA = count($A);
 
             $peaks = findPeaks($A);
-            $countPeaks = count($peaks);
 
-            switch ($countPeaks) {
-                case 0:
-                case 1:
-                    return $countPeaks;
-            }
-
-            $dividers = [];
-
-            if ($countPeaks * $countPeaks >= $countA) {
-                /**
-                 * find all chunks for peaks count that give square production more than array length:
-                 * 60: ($i = divisors located right side (except 60 and 30 - impossible amount of peaks); store left divisors in $dividers)
-                 * 1 = 60
-                 * 2 = 30
-                 * 3 = 20
-                 * 4 = 15
-                 * 5 = 12
-                 * 6 = 10
-                 */
-                for ($i = $countPeaks, $production = $i * $i; $production >= $countA; $i--, $production = $i * $i) {
-                    if ($countA % $i == 0) {
-                        $divider = $countA / $i;
-
-                        if ($production != $countA) {
-                            $dividers[] = $divider;
-                        }
-
-                        $chunkKey = getLastChunkPeakEnds($peaks, $divider);
-                        if ($chunkKey == $i) {
-                            return $i;
-                        }
-                    }
-                }
-
-                /**
-                 * 60: ($dividers = divisors located left side except 1 and 2)
-                 * 1 = 60
-                 * 2 = 30
-                 * 3 = 20
-                 * 4 = 15
-                 * 5 = 12
-                 * 6 = 10
-                 */
-                foreach ($dividers as $i) {
+            for ($i = count($peaks); $i > 0; $i--) {
+                if ($countA % $i == 0) {
                     $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
                     if ($chunkKey == $i) {
                         return $i;
-                    }
-                }
-
-                /**
-                 * handle last dividers: 1 and 2
-                 */
-                foreach ([1, 2] as $i) {
-                    $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
-                    if ($chunkKey == $i) {
-                        return $i;
-                    }
-                }
-            } else {
-                for ($i = $countPeaks; $i > 0; $i--) {
-                    if ($countA % $i == 0) {
-                        $chunkKey = getLastChunkPeakEnds($peaks, $countA / $i);
-                        if ($chunkKey == $i) {
-                            return $i;
-                        }
                     }
                 }
             }
@@ -296,60 +235,185 @@ class PrimeAndCompositeNumbersController extends Controller
         dd(solution($A));
     }
 
-
     /**
-     * 100% (copy-paste)
+     *
+
+    A non-empty array A consisting of N integers is given.
+
+    A peak is an array element which is larger than its neighbours.
+    More precisely, it is an index P such that 0 < P < N − 1 and A[P − 1] < A[P] > A[P + 1].
+
+    For example, the following array A:
+    A[0] = 1
+    A[1] = 5
+    A[2] = 3
+    A[3] = 4
+    A[4] = 3
+    A[5] = 4
+    A[6] = 1
+    A[7] = 2
+    A[8] = 3
+    A[9] = 4
+    A[10] = 6
+    A[11] = 2
+
+    has exactly four peaks: elements 1, 3, 5 and 10.
+
+    You are going on a trip to a range of mountains whose relative heights are represented by array A, as shown in a figure below.
+
+    https://codility-frontend-prod.s3.amazonaws.com/media/task_static/flags/static/images/auto/6f5e8faa3000c0a74157e6e0bc759b8a.png
+
+    You have to choose how many flags you should take with you. The goal is to set the maximum number of flags on the peaks, according to certain rules.
+
+    Flags can only be set on peaks. What's more, if you take K flags, then the distance between any two flags should be greater than or equal to K.
+    The distance between indices P and Q is the absolute value |P − Q|.
+
+    For example, given the mountain range represented by array A, above, with N = 12, if you take:
+
+    two flags, you can set them on peaks 1 and 5;
+    three flags, you can set them on peaks 1, 5 and 10;
+    four flags, you can set only three flags, on peaks 1, 5 and 10.
+
+    You can therefore set a maximum of three flags in this case.
+
+    Write a function:
+
+    function solution($A);
+
+    that, given a non-empty array A of N integers, returns the maximum number of flags that can be set on the peaks of the array.
+
+    For example, the following array A:
+    A[0] = 1
+    A[1] = 5
+    A[2] = 3
+    A[3] = 4
+    A[4] = 3
+    A[5] = 4
+    A[6] = 1
+    A[7] = 2
+    A[8] = 3
+    A[9] = 4
+    A[10] = 6
+    A[11] = 2
+
+    the function should return 3, as explained above.
+
+    Write an efficient algorithm for the following assumptions:
+
+    N is an integer within the range [1..400,000];
+    each element of array A is an integer within the range [0..1,000,000,000].
+
+     * 100%
+
      */
-    public function peaks2()
+    function flags()
     {
-        function solution($A) {
-            $n = count($A);
-            $prev = $n - 1;
-            if ($n <= 2) {
-                return 0;
-            }
-
-            $sum = array_fill(0, $n,0);
-            $last = -1;
-            $D = 0;
-
-            // fill $sum by amount of peaks on each index
-            for ($i = 1; $i < $prev; $i++) {
-                $sum[$i] = $sum[$i - 1];
-                if (($A[$i] > $A[$i - 1]) && ($A[$i] > $A[$i + 1])) {
-                    $D = max($D, $i - $last);
-                    $last = $i;
-                    ++$sum[$i];
+        function findPeaks($A) {
+            $last = count($A) - 1;
+            $peaks = [];
+            for ($i = 1; $i < $last; $i++) {
+                $p = $A[$i - 1];
+                $v = $A[$i];
+                $n = $A[$i + 1];
+                if ($p < $v && $v > $n) {
+                    $peaks[$i] = $i;
+                    $i++;
                 }
             }
 
-            // if no peaks
-            if (($sum[$n - 1] = $sum[$n - 2]) == 0) {
-                return 0;
-            }
-
-            $D = max($D, $n - $last);
-            for ($i = ($D >> 1) + 1; $i < $D; $i++) {
-                if ($n % $i == 0) {
-                    $last = 0;
-                    for ($j = $i; $j <= $n; $j += $i) {
-                        if ($sum[$j - 1] <= $last) {
-                            break;
-                        }
-                        $last = $sum[$j - 1];
-                    }
-                    if ($j > $n) {
-                        return $n / $i;
-                    }
-                }
-            }
-            for ($last = $D; $n % $last; ++$last);
-            return intval($n / $last);
+            return $peaks;
         }
 
-        $A = [1,2,3,"4",3,"4",1,2,3,4,"6",2];
-//        $A = [1, 1, 3, 2, 1, 3, 2, 3, 2, 3, 2, 1];
+        function getNext($N, $peaks) {
+            $next = array_fill(0, $N, 0);
+            $next[$N - 1] = -1;
 
-        dd(solution($A));
+            foreach (range($N -2, -1, -1) as $i) {
+                if (array_key_exists($i, $peaks)) {
+                    $next[$i] = $i;
+                } else {
+                    $next[$i] = $next[$i + 1];
+                }
+            }
+
+            return $next;
+        }
+
+        function solution($A) {
+            $N = count($A);
+            $peaks = findPeaks($A);
+
+            $next = getNext($N, $peaks);
+
+            $i = 1;
+            $result = 0;
+            while (($i - 1) * $i <= $N) {
+                $pos = 0;
+                $num = 0;
+                while ($pos < $N and $num < $i) {
+                    $pos = $next[$pos];
+                    if ($pos == -1) {
+                        break;
+                    }
+
+                    $num++;
+                    $pos++;
+                }
+
+                $result = max($result, $num);
+                $i++;
+            }
+
+            return $result;
+        }
+
+        $A = [1,"5",3,"4",3,"4",1,2,3,4,"6",2]; // 3
+        _d(solution($A));
+//        $A = [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0]; // 3
+//        _d(solution($A));
+//        $A = [0, 1, 0, 0, 1, 0, 0, 0, 1]; // 2
+//        _d(solution($A));
+//        $A = [0, 0, 0, 0, 0, 1, 0, 1, 0, 1]; // 2
+//        _d(solution($A));
+//        $A = [1]; // 0
+//        _d(solution($A));
+    }
+
+    public function makeCopiesApplePhotos()
+    {
+        set_time_limit(120);
+        $tt = new Carbon();
+
+        $dir = '/Users/alextsyk/Library/Containers/com.eltima.cmd1.mas/Data/Pictures/Photos Library.photoslibrary/Masters';
+        $destination = '/Users/alextsyk/Desktop/Photos_From_Apple';
+
+        $files = [];
+        $FilesDoubled = [];
+
+        function parseAndCopy($dir, $destination, &$files, &$FilesDoubled) {
+            if (is_dir($dir)) {
+                $dirs = array_filter(scandir($dir), function($i) {return $i != '.' && $i != '..';});
+                foreach ($dirs as $dir_) {
+                    parseAndCopy("$dir/$dir_", $destination, $files, $FilesDoubled);
+                }
+            }
+
+            $imageType = @exif_imagetype($dir);
+            if (is_file($dir) && ($imageType == IMAGETYPE_JPEG || $imageType == IMAGETYPE_PNG)) {
+                $fileName = basename($dir);
+
+                copy($dir, "$destination/$fileName");
+
+                $files[] = $fileName;
+            }
+        }
+
+        parseAndCopy($dir, $destination, $files, $FilesDoubled);
+
+        $tt1 = new Carbon();
+
+        $ttDiff = $tt1->diffForHumans($tt);
+
+        dd($ttDiff, $files, $FilesDoubled);
     }
 }

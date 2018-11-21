@@ -59,7 +59,9 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/count_factors', 'PrimeAndCompositeNumbersController@count_factors');
     $route->get('/min_perimeter_rectangle', 'PrimeAndCompositeNumbersController@min_perimeter_rectangle');
     $route->get('/peaks', 'PrimeAndCompositeNumbersController@peaks');
-    $route->get('/peaks2', 'PrimeAndCompositeNumbersController@peaks2');
+    $route->get('/flags', 'PrimeAndCompositeNumbersController@flags');
+
+    $route->get('/makeCopiesApplePhotos', 'PrimeAndCompositeNumbersController@makeCopiesApplePhotos');
 
 });
 
