@@ -47,21 +47,23 @@ class ArraysController extends Controller
     expected worst-case space complexity is O(1), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%  =  O(N) or O(N*log(N))
 
      */
     public function add_occurrences_in_array()
     {
-        function solution($N) {
-            $result = 10;
-            foreach($N as $a) {
+        function solution($A) {
+            $result = 0;
+            foreach ($A as $a) {
                 $result = $result ^ $a;
             }
 
             return $result;
         }
 
-        $N = [9,2,5,6,5,4,2,6,9];
-        dd(solution($N));
+        $A = [9,2,5,6,5,4,2,6,9];
+        dd(solution($A));
     }
 
 
@@ -87,62 +89,35 @@ class ArraysController extends Controller
     each element of array A is an integer within the range [−1,000..1,000].
 
     In your solution, focus on correctness. The performance of your solution will not be the focus of the assessment.
+     *
+     * 100%
 
-     */
-    public function cyclic_rotation_()
-    {
-        function solution($A, $K) {
-            $arrayLength = count($A);
-
-            if ($arrayLength) {
-                $rotations = $K % $arrayLength;
-                $buffer = [];
-
-                for ($i = $rotations; $i > 0; $i--) {
-                    $buffer[] = $A[$arrayLength - $i];
-                }
-
-                for ($i = $arrayLength - $rotations - 1; $i > -1; $i--) {
-                    $A[$i + $rotations] = $A[$i];
-                }
-
-                for ($i = 0; $i < $rotations; $i++) {
-                    $A[$i] = $buffer[$i];
-                }
-            }
-
-            return $A;
-        }
-
-        $arr = [3, 8, 9, 7, 6];
-        $rotations = 3;
-
-        dd(solution($arr, $rotations));
-    }
-
-
-    /**
-     * Improved
      */
     public function cyclic_rotation()
     {
-        function solution($N, $K) {
-            $buffer = [];
+        function solution($A, $K) {
+            $newArr = [];
 
-            if (count($N)) {
-                $count = $K % count($N);
-                for ($i = 0; $i < $count; $i++) {
-                    array_unshift($buffer, array_pop($N));
+            $N = count($A);
+            if ($N) {
+                $R = $K % $N;
+                $L = $N - $R;
+
+                for ($i = 0; $i < $R; $i++) {
+                    $newArr[$i] = $A[$L + $i];
+                }
+                for ($i = $R; $i < $N; $i++) {
+                    $newArr[$i] = $A[$i - $R];
                 }
             }
 
-            return array_merge($buffer, $N);
+            return $newArr;
         }
 
-        $N = [3, 8, 9, 7, 6];
-        $N = [3, 8, ];
-//        $N = [];
+        $A = [3, 8, 9, 7, 6];
+//        $A = [3, 8, ];
+//        $A = [];
         $K = 3;
-        dd($N, $K, solution($N, $K));
+        dd($A, $K, solution($A, $K));
     }
 }

@@ -157,48 +157,20 @@ class CountingElementsController extends Controller
     Elements of input arrays can be modified.
 
      */
-    public function perm_check_()
-    {
-        function solution($A) {
-            sort($A);
-
-            $start = 1;
-            foreach ($A as $item) {
-                if ($item != $start) {
-                    return 0;
-                }
-
-                $start++;
-            }
-
-            return 1;
-        }
-
-        $A = [1,2,4];
-//        $A = [1,2,2];
-
-        $isPerm = solution($A);
-
-        dd($isPerm);
-    }
-
-    /**
-     * Improve
-     */
     public function perm_check()
     {
         function solution($A) {
-            $count = [];
+            $keys = [];
             foreach ($A as $a) {
-                if (isset($count[$a])) {
+                if (array_key_exists($a, $keys)) {
                     return 0;
                 }
 
-                $count[$a] = 1;
+                $keys[$a] = true;
             }
 
-            for ($i = 1; $i <= count($A); $i++) {
-                if (!isset($count[$i])) {
+            for ($i = 1, $N = count($A) + 1; $i < $N; $i++) {
+                if (!array_key_exists($i, $keys)) {
                     return 0;
                 }
             }
@@ -206,11 +178,20 @@ class CountingElementsController extends Controller
             return 1;
         }
 
-//        $A = [4,1,3,2];
-        $A = [1,1,4,4];
-        $A = [9, 5, 7, 3, 2, 7, 3, 1, 10, 8] ;
 
-        dd(solution($A));
+        $A = [4,1,3,2];
+        _d(solution($A));
+
+        $A = [4,1,3];
+        _d(solution($A));
+        _d(solution($A));
+
+        $A = [4,1,4,3];
+        _d(solution($A));
+
+        $A = [9, 5, 7, 3, 2, 7, 3, 1, 10, 8];
+        _d(solution($A));
+
     }
 
     /**
@@ -313,37 +294,33 @@ class CountingElementsController extends Controller
      */
     public function frog_river_one()
     {
-        function full_sum($N) {
-            return ($N * ($N + 1)) / 2;
+        function allSum($X) {
+            return ($X * ($X + 1)) / 2;
         }
 
         function solution($X, $A) {
-            $sum = full_sum($X);
+            $sum = allsum($X);
 
-            $count = [];
-            $lastLeaf = null;
+            $keys = [];
             foreach ($A as $k => $a) {
-                if ($sum <= 0) {
-                    break;
-                }
-
-                if (!isset($count[$a])) {
-                    $count[$a] = $lastLeaf = $k;
+                if (!array_key_exists($a, $keys)) {
+                    $keys[$a] = true;
                     $sum -= $a;
-                }
-            }
 
-            if (count($count) == $X) {
-                return $lastLeaf;
+                    if ($sum == 0) {
+                        return $k;
+                    }
+                }
             }
 
             return -1;
         }
 
+
         $X = 5;
         $A = [1,3,1,4,2,3,5,4,3,2];
 
-        dd(solution($X, $A));
+        dd($A, solution($X, $A));
     }
 
     /**

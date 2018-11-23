@@ -23,12 +23,12 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/cyclic_rotation', 'ArraysController@cyclic_rotation');
     $route->get('/add_occurrences_in_array', 'ArraysController@add_occurrences_in_array');
 
-    $route->get('/tape_equilibrium', 'TimeComplexityController@tape_equilibrium');
     $route->get('/perm_missing_elem', 'TimeComplexityController@perm_missing_elem');
     $route->get('/frog_jump', 'TimeComplexityController@frog_jump');
+    $route->get('/tape_equilibrium', 'TimeComplexityController@tape_equilibrium');
 
-    $route->get('/missing_integer', 'CountingElementsController@missing_integer');
     $route->get('/perm_check', 'CountingElementsController@perm_check');
+    $route->get('/missing_integer', 'CountingElementsController@missing_integer');
     $route->get('/frog_river_one', 'CountingElementsController@frog_river_one');
     $route->get('/max_counters', 'CountingElementsController@max_counters');
 

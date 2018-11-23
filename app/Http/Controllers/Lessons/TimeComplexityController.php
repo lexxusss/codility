@@ -59,9 +59,11 @@ class TimeComplexityController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
-    public function tape_equilibrium_()
+    public function tape_equilibrium()
     {
         function solution($A) {
             $last = count($A) - 1;
@@ -82,10 +84,10 @@ class TimeComplexityController extends Controller
             return $minDiff;
         }
 
-//        $arr = [-1000, 1000];
-        $arr = [-10, -20, -30, -40, 100];
+        $A = [-1000, 1000];
+//        $A = [-10, -20, -30, -40, 100];
 
-        $minDiff = solution($arr);
+        $minDiff = solution($A);
 
         dd($minDiff);
     }
@@ -123,6 +125,8 @@ class TimeComplexityController extends Controller
     expected worst-case space complexity is O(1), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function perm_missing_elem()

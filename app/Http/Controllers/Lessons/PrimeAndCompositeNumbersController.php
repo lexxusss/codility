@@ -387,33 +387,34 @@ class PrimeAndCompositeNumbersController extends Controller
         $dir = '/Users/alextsyk/Library/Containers/com.eltima.cmd1.mas/Data/Pictures/Photos Library.photoslibrary/Masters';
         $destination = '/Users/alextsyk/Desktop/Photos_From_Apple';
 
-        $files = [];
-        $FilesDoubled = [];
-
-        function parseAndCopy($dir, $destination, &$files, &$FilesDoubled) {
+        function parseAndCopy($dir, $destination, &$files) {
             if (is_dir($dir)) {
                 $dirs = array_filter(scandir($dir), function($i) {return $i != '.' && $i != '..';});
                 foreach ($dirs as $dir_) {
-                    parseAndCopy("$dir/$dir_", $destination, $files, $FilesDoubled);
+                    parseAndCopy("$dir/$dir_", $destination, $files);
                 }
-            }
-
-            $imageType = @exif_imagetype($dir);
-            if (is_file($dir) && ($imageType == IMAGETYPE_JPEG || $imageType == IMAGETYPE_PNG)) {
+            } elseif (is_file($dir)) {
+                $ext = strtoupper(pathinfo($dir, PATHINFO_EXTENSION) ?: 'none');
                 $fileName = basename($dir);
 
-                copy($dir, "$destination/$fileName");
+                if (!is_file("$destination/$ext/$fileName")) {
+                    if (!is_dir("$destination/$ext")) {
+                        mkdir("$destination/$ext");
+                    }
+                    copy($dir, "$destination/$ext/$fileName");
+                }
 
-                $files[] = $fileName;
+                $files[$ext][] = $dir;
             }
         }
 
-        parseAndCopy($dir, $destination, $files, $FilesDoubled);
+        $files = [];
+        parseAndCopy($dir, $destination, $files);
 
         $tt1 = new Carbon();
 
         $ttDiff = $tt1->diffForHumans($tt);
 
-        dd($ttDiff, $files, $FilesDoubled);
+        dd($ttDiff, $files);
     }
 }

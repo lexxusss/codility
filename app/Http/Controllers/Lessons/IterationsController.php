@@ -40,16 +40,13 @@ class IterationsController extends Controller
             $binary = decbin($N);
             $arr = str_split($binary);
 
-            $gap = $maxGap = 0;
-            foreach ($arr as $key => $num) {
-                $isGap = $num == 0;
-
-                if ($isGap) {
+            $maxGap = $gap = 0;
+            foreach ($arr as $num) {
+                if ($num == 0) {
                     $gap++;
                 } else {
                     $maxGap = max($gap, $maxGap);
                     $gap = 0;
-
                 }
             }
 
