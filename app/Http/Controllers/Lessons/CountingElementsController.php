@@ -36,61 +36,21 @@ class CountingElementsController extends Controller
 
     Elements of input arrays can be modified.
      */
-    public function missing_integer_()
-    {
-        function solution($Arr)
-        {
-            $Arr = array_unique($Arr);
-
-            sort($Arr);
-
-            $Arr = array_filter($Arr, function ($item) {
-               return  $item > 0;
-            });
-            $Arr = array_values($Arr);
-
-            $length = count($Arr);
-            $minNumber = 1;
-
-            for ($i = 0; $i < $length; $i++) {
-                if ($Arr[$i] != $minNumber) {
-                    break;
-                }
-
-                $minNumber++;
-            }
-
-            return $minNumber;
-        }
-
-        $leftPartOfArr = range(0, 100);
-        $rightPartOfArr = range(102, 200);
-        shuffle($leftPartOfArr);
-        shuffle($rightPartOfArr);
-
-        $Arr = array_merge($leftPartOfArr, $rightPartOfArr);
-//        $Arr = [-3, -4, -6, 1, 3, 6, 4, 1, 2];
-//        $Arr = [3];
-
-        $minNumber = solution($Arr);
-
-        dd($minNumber);
-    }
-
-    /**
-     * Improve
-     */
     public function missing_integer()
     {
+
         function solution($A) {
-            $count = [];
+            $keys = [];
             foreach ($A as $a) {
-                if ($a > 0 && !isset($count[$a])) {
-                    $count[$a] = 1;
+                if ($a > 0) {
+                    $keys[$a] = true;
                 }
             }
 
-            for ($i = 1; isset($count[$i]); $i++);
+            $i = 1;
+            while (array_key_exists($i, $keys)) {
+                $i++;
+            }
 
             return $i;
         }
@@ -248,50 +208,6 @@ class CountingElementsController extends Controller
     Elements of input arrays can be modified.
 
      */
-    public function frog_river_one_()
-    {
-        function is_perm($A) {
-            sort($A);
-
-            $start = 1;
-            foreach ($A as $item) {
-                if ($item != $start) {
-                    return 0;
-                }
-
-                $start++;
-            }
-
-            return 1;
-        }
-
-        function solution($X, $A) {
-            $A = array_unique($A);
-
-            if (is_perm($A)) {
-                if (in_array($X, $A)) {
-                    $A = array_flip($A);
-
-                    return array_pop($A);
-                }
-            }
-
-            return -1;
-        }
-
-//        $A = [1,3,1,4,2,3,5,4];
-        $A = [1, 3, 1, 3, 2, 1, 3];
-//        $X = 5;
-        $X = 3;
-
-        $frogJumps = solution($X, $A);
-
-        dd($frogJumps);
-    }
-
-    /**
-     * Improve
-     */
     public function frog_river_one()
     {
         function allSum($X) {
@@ -408,68 +324,33 @@ class CountingElementsController extends Controller
     (3, 2, 2, 3, 2)
     (3, 2, 2, 4, 2)
      */
-    public function max_counters_()
-    {
-        function solution($N, $A) {
-            $maxCounter = 0;
-            $sequence = array_fill(0, $N, $maxCounter);
-
-            $flashValue = $maxCounter;
-            foreach ($A as $item) {
-                if ($item > 0 && $item <= $N) {
-                    $key = $item - 1;
-
-                    $sequence[$key] = max($sequence[$key], $flashValue) + 1;
-
-                    $maxCounter = max($sequence[$key], $maxCounter);
-                } elseif ($item == $N + 1) {
-                    $flashValue = $maxCounter;
-                }
-            }
-
-            array_walk($sequence, function (&$item) use ($flashValue) {
-                $item = max($item, $flashValue);
-            });
-
-            return $sequence;
-        }
-
-        $N = 5;
-        $A = [3,4,4,6,1,4,4];
-//        $N = 1;
-//        $A = [1];
-
-        $sequence = solution($N, $A);
-
-        dd($sequence);
-    }
-
-    /**
-     * Improve
-     */
     public function max_counters()
     {
-        function solution($N, $A) {
-            $max = $min = 0;
-            $init = array_fill(0, $N, $min);
+        function solution($N , $A) {
+            $result = array_fill(0, $N, 0);
 
+            $maxToAdd = $maxVal = 0;
             foreach ($A as $a) {
-                if ($a > 0 && $a <= $N) {
-                    $a--;
-                    $init[$a] = max($init[$a], $min) + 1;
-                    $max = max($max, $init[$a]);
-                } elseif ($a == $N + 1) {
-                    $min = $max;
+                if ($a > $N) {
+                    $maxToAdd = $maxVal;
+                } else {
+                    $result[$a - 1] = max($result[$a - 1], $maxToAdd) + 1;
+
+                    $maxVal = max($maxVal, $result[$a - 1]);
                 }
             }
 
-            foreach ($init as &$i) $i = max($min, $i);
+            foreach ($result as &$r) {
+                $r = max($r, $maxToAdd);
+            }
 
-            return $init;
+            return $result;
         }
 
         $N = 5;
         $A = [3,4,4,6,1,4,4,];
+//        $N = 1;
+//        $A = [1];
 
         dd(solution($N, $A));
     }

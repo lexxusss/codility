@@ -28,9 +28,9 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/tape_equilibrium', 'TimeComplexityController@tape_equilibrium');
 
     $route->get('/perm_check', 'CountingElementsController@perm_check');
-    $route->get('/missing_integer', 'CountingElementsController@missing_integer');
     $route->get('/frog_river_one', 'CountingElementsController@frog_river_one');
     $route->get('/max_counters', 'CountingElementsController@max_counters');
+    $route->get('/missing_integer', 'CountingElementsController@missing_integer');
 
     $route->get('/count_div', 'PrefixSumsController@count_div');
     $route->get('/passing_cars', 'PrefixSumsController@passing_cars');
