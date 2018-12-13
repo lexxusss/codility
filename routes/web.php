@@ -13,9 +13,27 @@ use \Illuminate\Routing\Router;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::post('/test', 'HomeController@test');
+Route::get('/test', 'HomeController@test');
 
 Route::get('/', 'HomeController@index');
+
+Route::group(['namespace' => 'Challenges', 'prefix' => 'challenges'], function(Router $route) {
+    $route->group(['prefix' => 'arsenicum'], function(Router $route) {
+        $route->get('/task1', 'ArsenicumChallengeController@task1');
+        $route->get('/task2', 'ArsenicumChallengeController@task2');
+        $route->get('/task3', 'ArsenicumChallengeController@task3');
+    });
+});
+
+Route::group(['namespace' => 'Codility', 'prefix' => 'codility'], function(Router $route) {
+    $route->group(['prefix' => 'test'], function(Router $route) {
+        $route->get('/task1', 'CodilityController@task1');
+        $route->get('/task2', 'CodilityController@task2');
+        $route->get('/task3', 'CodilityController@task3');
+        $route->get('/task4', 'CodilityController@task4');
+        $route->get('/task5', 'CodilityController@task5');
+    });
+});
 
 Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/binary_gap', 'IterationsController@binary_gap');
@@ -32,8 +50,8 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/max_counters', 'CountingElementsController@max_counters');
     $route->get('/missing_integer', 'CountingElementsController@missing_integer');
 
-    $route->get('/count_div', 'PrefixSumsController@count_div');
     $route->get('/passing_cars', 'PrefixSumsController@passing_cars');
+    $route->get('/count_div', 'PrefixSumsController@count_div');
     $route->get('/genomic_range_query', 'PrefixSumsController@genomic_range_query');
     $route->get('/min_avg_two_slice', 'PrefixSumsController@min_avg_two_slice');
 

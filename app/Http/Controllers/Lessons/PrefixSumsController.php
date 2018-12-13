@@ -37,20 +37,19 @@ class PrefixSumsController extends Controller
     expected worst-case time complexity is O(1);
     expected worst-case space complexity is O(1).
 
+     * 100%
 
      */
     public function count_div()
     {
         function solution($A, $B, $K) {
-            $diversTill_A = (int) floor(($A - 1) / $K);
-            $dividersTill_B = (int) floor($B / $K);
+            $divA = (int) ceil($A / $K) - 1;
+            $divB = (int) ($B / $K);
 
-            return $dividersTill_B - $diversTill_A;
+            return $divB - $divA;
         }
 
-        $A = 6;
-        $B = 11;
-        $K = 2;
+        list($A, $B, $K) = [0, 12, 2];
 
         $dividers = solution($A, $B, $K);
 
@@ -106,35 +105,70 @@ class PrefixSumsController extends Controller
     expected worst-case space complexity is O(1), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function passing_cars()
     {
+
+        // prefix sums algorithm - 100%
+//        function solution($A) {
+//            $max = 1000000000;
+//
+//            $countStart = false;
+//            $sums = [];
+//            $sum = 0;
+//            foreach ($A as $k => $a) {
+//                if ($countStart) {
+//                    $sum += $a;
+//                } else {
+//                    $countStart = !$a;
+//                }
+//
+//                $sums[$k] = $sum;
+//            }
+//
+//            $pairs = 0;
+//            foreach ($A as $k => $a) {
+//                if (!$a) {
+//                    $pairs += $sum - $sums[$k];
+//
+//                    if ($pairs > $max) {
+//                        return -1;
+//                    }
+//                }
+//            }
+//
+//            return $pairs;
+//        }
+
+        // easy algorithm - 100%
         function solution($A) {
-            $passing = 0;
+            $max = 1000000000;
 
-            $maxPairs = 1000000000;
-            $pairs = 0;
-            foreach ($A as $item) {
-                if ($item) {
-                    $pairs += $passing;
+            $pairs = $passKoeff = 0;
+            foreach ($A as $a) {
+                if (!$a) {
+                    $passKoeff++;
+                } else {
+                    $pairs += $passKoeff;
 
-                    if ($pairs > $maxPairs) {
+                    if ($pairs > $max) {
                         return -1;
                     }
-                } else {
-                    $passing++;
                 }
             }
 
             return $pairs;
         }
 
-        $A = [0,0,1,1,1];
+//        $A = [1,0,1,0,1,1];
+        $A = [0,1,0,1,0,1];
 
         $pairs = solution($A);
 
-        dd($pairs);
+        dd($A, $pairs);
     }
 
     /**
@@ -194,141 +228,54 @@ class PrefixSumsController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
-     */
-    public function genomic_range_query_()
-    {
-        function getMin($minI, $maxI, $appears, $S) {
-            if ($minI != $maxI) {
-                if ($minI > 0) {
-                    $appearsMin_I = $appears[$minI - 1];
-                }
-
-                $appearsMax_I = $appears[$maxI];
-
-                foreach ($appearsMax_I as $key => $item) {
-                    if ($item > 0) {
-                        if (empty($appearsMin_I) || $item - $appearsMin_I[$key] > 0) {
-                            return $key;
-                        }
-                    }
-                }
-            }
-
-            return $S[$minI];
-        }
-
-        function getAppears($S) {
-            $appears = [];
-
-            $A_appears = 0;
-            $C_appears = 0;
-            $G_appears = 0;
-            $T_appears = 0;
-            for ($i = 0; !empty($S[$i]); $i++) {
-                $appears[$i] = [
-                    'A' => ($S[$i] == 'A') ? ++$A_appears : $A_appears,
-                    'C' => ($S[$i] == 'C') ? ++$C_appears : $C_appears,
-                    'G' => ($S[$i] == 'G') ? ++$G_appears : $G_appears,
-                    'T' => ($S[$i] == 'T') ? ++$T_appears : $T_appears,
-                ];
-            }
-
-            return $appears;
-        }
-
-        function solution($S, $P, $Q) {
-            $table = [
-                'A' => 1,
-                'C' => 2,
-                'G' => 3,
-                'T' => 4,
-            ];
-
-            $appears = getAppears($S);
-
-            $minVals = [];
-            foreach ($P as $i => $minI) {
-                $maxI = $Q[$i];
-
-                $minVal = getMin($minI, $maxI, $appears, $S);
-
-                $minVals[] = $table[$minVal];
-            }
-
-            return $minVals;
-        }
-
-//        $S = 'CAGCCTA';
-//        $P = [2,5,0];
-//        $Q = [4,5,6];
-//        $S = 'A';
-//        $P = [0];
-//        $Q = [0];
-        $S = 'AC';
-        $P = [0, 0, 1];
-        $Q = [0, 1, 1];
-
-        $minVals = solution($S, $P, $Q);
-
-        dd($minVals);
-    }
-
-    /**
-     * Improve
      */
     public function genomic_range_query()
     {
-        function get_appears($S, $numbers) {
-            $appears = [];
-            $count = array_fill($numbers['A'], count($numbers),0);
-            for ($i = 0; $i < strlen($S); $i++) {
-                $factor = $numbers[$S[$i]];
-                $count[$factor]++;
-                $appears[$i] = $count;
+        function getCountsInit($D, $A) {
+            $letters = [];
+            foreach ($D as $d) {
+                $letters[$d] = 0;
             }
 
-            return $appears;
-        }
-
-        function get_min_from_appears($min, $max, $appears, $S, $numbers) {
-            if ($min == $max) {
-                return $numbers[$S[$max]];
-            }
-
-            if (array_key_exists($min  - 1, $appears)) {
-                return key(array_diff_assoc($appears[$max], $appears[$min-1]));
-            }
-
-            return get_first_key_with_non_zero_value($appears[$max]);
-        }
-
-        function get_first_key_with_non_zero_value($A) {
+            $init = [[$D['A'] => 0, $D['C'] => 0, $D['G'] => 0, $D['T'] => 0]];
             foreach ($A as $k => $a) {
-                if (!empty($a)) {
-                    return $k;
+                $letters[$a]++;
+                $init[$k+1] = $letters;
+            }
+
+            return $init;
+        }
+        function getImpactFactor($p, $q, $init) {
+            $qInit = $init[$q+1];
+            $pInit = $init[$p];
+
+            $factor = 5;
+            foreach ($qInit as $l => $q) {
+                $p = $pInit[$l];
+                $res = $q - $p;
+                if ($res > 0) {
+                    $factor = min($factor, $l);
                 }
             }
 
-            return null;
+            return $factor;
         }
-
         function solution($S, $P, $Q) {
-            $numbers = [
-                'A' => 1,
-                'C' => 2,
-                'G' => 3,
-                'T' => 4,
-            ];
+            $D = ['A' => 1, 'C' => 2, 'G' => 3, 'T' => 4];
+            $A = str_split(strtr($S, $D), 1);
+            $init = getCountsInit($D, $A);
 
-            $appears = get_appears($S, $numbers);
+            $impactFactors = [];
+            foreach ($P as $k => $p) {
+                $q = $Q[$k];
 
-            $mins = [];
-            foreach ($P as $k => $min) {
-                $mins[] = get_min_from_appears($min, $Q[$k], $appears, $S, $numbers);
+                $impactFactors[] = getImpactFactor($p, $q, $init);
             }
 
-            return $mins;
+            return $impactFactors;
         }
 
 //        list($S, $P, $Q) = ['CAGCCTA', [2,5,0], [4,5,6]];
@@ -392,6 +339,8 @@ class PrefixSumsController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function min_avg_two_slice()
@@ -407,7 +356,6 @@ class PrefixSumsController extends Controller
 
         function solution($A) {
             $length = count($A);
-
 
             $minAverageKey = 0;
             $minAverage = average($A, $minAverageKey, 1);
@@ -431,10 +379,11 @@ class PrefixSumsController extends Controller
         }
 
 //        $A = [4,2,2,5,1,5,8];
-        $A = [-3, -5, -8, -4, -10];
+        $A = [0,1,0,1];
+//        $A = [-3, -5, -8, -4, -10];
 
         $minAverage = solution($A);
 
-        dd($minAverage);
+        dd($A, $minAverage);
     }
 }
