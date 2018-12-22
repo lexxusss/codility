@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Lessons;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 /**
@@ -103,26 +102,34 @@ class SortingController extends Controller
     expected worst-case space complexity is O(1), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100% ( O(N) or O(N * log(N)) )
 
      */
     public function max_product_of_three()
     {
-        function solution($A) {
-            rsort($A);
-            $length = count($A);
+        // (N * log(N)) - 100%
+        function solution ($A) {
+            $N = count($A);
 
-            $tripletLeft = $A[0] * $A[1] * $A[2];
-            $tripletRight = $A[0] * $A[$length - 1] * $A[$length - 2];
+            sort($A);
 
-            return max($tripletLeft, $tripletRight);
+            return max($A[0] * $A[1] * $A[$N - 1], $A[$N - 1] * $A[$N - 2] * $A[$N - 3]);
         }
 
-        $A = [-3,1,2,-2,5,6];
-//        $A = [-5, 5, -5, 4];
+        $A = [-3,1,2,-2,5,6]; // 60
+//        $A = [4, 5, 1, 0]; // 20
+//        $A = [4,5,-5,-6,4,]; // 150
+//        $A = [4,5,-6,-5,4,]; // 150
+//        $A = [4,5,-5,-5,4,]; // 125
+//        $A = [10,10,10]; // 1000
+//        $A = [1,1,1]; // 1
+//        $A = [0,1,2,0,5,6]; // 60
+//        $A = [-5, 5, -5, 4]; // 125
 
         $maxTriplet = solution($A);
 
-        dd($maxTriplet);
+        dd($A, $maxTriplet);
     }
 
     /**
@@ -167,21 +174,19 @@ class SortingController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function triangle()
     {
         function solution($A) {
-            sort($A);
-            $length = count($A);
+            $N = count($A);
+            if ($N > 2) {
+                sort($A);
 
-            if ($length > 2) {
-                $last = $length - 2;
-                for ($i = 0; $i < $last; $i++) {
-                    $next = $i + 1;
-                    $postNext = $i + 2;
-
-                    if ($A[$i] + $A[$next] > $A[$postNext]) {
+                for ($i = 2; $i < $N; $i++) {
+                    if ($A[$i] < $A[$i - 1] + $A[$i - 2]) {
                         return 1;
                     }
                 }
@@ -202,7 +207,8 @@ class SortingController extends Controller
     /**
      *
 
-    We draw N discs on a plane. The discs are numbered from 0 to N − 1. A zero-indexed array A of N non-negative integers, specifying the radiuses of the discs, is given. The J-th disc is drawn with its center at (J, 0) and radius A[J].
+    We draw N discs on a plane. The discs are numbered from 0 to N − 1. A zero-indexed array A of N non-negative integers, specifying the radiuses of the discs, is given.
+    The J-th disc is drawn with its center at (J, 0) and radius A[J].
 
     We say that the J-th disc and K-th disc intersect if J ≠ K and the J-th and K-th discs have at least one common point (assuming that the discs contain their borders).
 
@@ -243,61 +249,36 @@ class SortingController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
+     *
+     * explanation:
+     * http://www.lucainvernizzi.net/blog/2014/11/21/codility-beta-challenge-number-of-disc-intersections/
 
      */
     public function number_of_disc_intersections()
     {
-        function binary_search_loop($A, $N)
-        {
-            $left = 0;
-            $right = count($A)-1;
-
-            while ($left <= $right) {
-                $mid = ($left + $right) >> 1;
-
-                if ($A[$mid] == $N) {
-                    return $mid;
-                } elseif ($A[$mid] > $N) {
-                    $right = $mid - 1;
-                } elseif ($A[$mid] < $N) {
-                    $left = $mid + 1;
-                }
-            }
-
-            return -1;
-        }
-
         function solution($A) {
-            $length = count($A);
+            $max = 10000000;
 
-            $leftSides = [];
-            $rightSides = [];
-
-            foreach ($A as $key => $item) {
-                $leftSides[$key] = $key - $item;
-                $rightSides[$key] = $key + $item;
+            $opens = $closes = [];
+            foreach ($A as $k => $a) {
+                $opens[] = $k - $a;
+                $closes[] = $k + $a;
             }
 
+            sort($opens);
+            sort($closes);
 
-            sort($leftSides);
-            sort($rightSides);
+            $count = $o = 0;
+            foreach ($closes as $c => $close) {
+                while (array_key_exists($o, $opens) && $close >= $opens[$o]) {
+                    $count += $o++ - $c;
 
-            $count = 0;
-            $leftCenter = 0;
-            foreach ($rightSides as $rightCenter => $rightSide) {
-                if ($leftCenter >= $length) break;
-
-                while ($leftSides[$leftCenter] <= $rightSide) {
-                    $distance = $leftCenter - $rightCenter;
-                    $count += $distance;
-
-                    $leftCenter++;
-                    if ($leftCenter >= $length) break;
+                    if ($count > $max) {
+                        return -1;
+                    }
                 }
-            }
-
-            if ($count > 10000000) {
-                return -1;
             }
 
             return $count;
@@ -312,10 +293,10 @@ class SortingController extends Controller
             5 => 0,
         ];
 
-        $A = [
-            0 => 1,
-            4 => 3
-        ];
+//        $A = [
+//            0 => 1,
+//            4 => 3
+//        ];
 
         $intersections = solution($A);
 
