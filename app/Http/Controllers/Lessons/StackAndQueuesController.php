@@ -35,45 +35,47 @@ class StackAndQueuesController extends Controller
 
     expected worst-case time complexity is O(N);
     expected worst-case space complexity is O(N) (not counting the storage required for input arguments).
+     *
+     * 100%
 
      */
     public function brackets()
     {
         function solution($S) {
             $pairs = [
-                ')' => '(',
-                ']' => '[',
-                '}' => '{',
+                '(' => ')',
+                '[' => ']',
+                '{' => '}',
             ];
 
-            $length = strlen($S);
+            $N = strlen($S);
+            if ($N % 2 != 0) {
+                return 0;
+            }
 
-            if ($length % 2 != 0) return 0;
+            $stack = [];
+            for ($i = 0; $i < $N; $i++) {
+                $sN = $S[$i];
 
-            $opened = [];
-            $openedLastIndex = -1;
-            for ($i = 0; $i < $length; $i++) {
-                $char = $S[$i];
-
-                if (in_array($char, $pairs)) {
-                    $opened[] = $char;
-                    $openedLastIndex++;
+                // if opened bracket
+                if (array_key_exists($sN, $pairs)) {
+                    array_push($stack, $sN);
                 } else {
-                    if ($openedLastIndex < 0 || $opened[$openedLastIndex] != $pairs[$char]) {
+                    $s = array_pop($stack);
+
+                    if ($s && $sN != $pairs[$s]) {
                         return 0;
                     }
-
-                    array_pop($opened);
-                    $openedLastIndex--;
                 }
             }
 
-            return (int) empty($opened);
+            return (int) !$stack;
         }
 
-//        $S = '{[()()]}';
-//        $S = '([)()]';
-        $S = '{()[()]}';
+//        $S = '{[()()]}'; // 1
+//        $S = '([)()]'; // 0
+//        $S = '{()[()]}'; // 1
+        $S = '[(){}]{()}'; // 1
 
         $isNested = solution($S);
 
@@ -142,60 +144,51 @@ class StackAndQueuesController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function fish()
     {
-        function solution ($A, $B) {
-            $length = count($A);
-            $DOWN_STREAM = 1;
+        // push and pop solution
+        function solution($A, $B) {
+            $N = count($A);
+            $alives = [];
 
-            $down_streams = [];
-            $down_streams_count = 0;
-            $up_streams_count = 0;
+            for ($k = 0; $k < $N; $k++) {
+                $b = $B[$k];
+                $a = $A[$k];
 
-            for ($i = 0; $i < $length; $i++) {
-                $direction = $B[$i];
-
-                if ($direction == $DOWN_STREAM) {
-                    array_push($down_streams, $i);
-                    $down_streams_count++;
+                if (!$alives) {
+                    array_push($alives, [$b => $a]);
                 } else {
-                    $upStreamSize = $A[$i];
-                    $up_streams_count++;
-
-                    while ($down_streams_count > 0) {
-                        $downStreamIndex = array_pop($down_streams);
-                        $down_streams_count--;
-                        $downStreamSize = $A[$downStreamIndex];
-
-                        if ($upStreamSize < $downStreamSize) {
-                            array_push($down_streams, $downStreamIndex);
-                            $down_streams_count++;
-                            $up_streams_count--;
-
-                            break;
-                        }
+                    $alive = array_pop($alives);
+                    array_push($alives, $alive);
+                    if ($b == 1 || key($alive) == 0) {
+                        array_push($alives, [$b => $a]);
+                    } elseif (key($alive) == 1 && current($alive) < $a) {
+                        array_pop($alives);
+                        $k--;
                     }
                 }
             }
 
-            return $up_streams_count + $down_streams_count;
+            return count($alives);
         }
 
 
 //        $A = [1,2,3,4,5,6,7,8];
 //        $B = [0,0,0,1,0,1,1,1];
 
-//        $A = [4, 3, 2, 1, 5];
-//        $B = [0, 1, 0, 0, 0];
+        $A = [4, 3, 2, 1, 5];
+        $B = [0, 1, 1, 0, 0];
 
-            $A = [3,4,5,6,3,1,8,2,7];
-            $B = [1,1,1,1,0,1,0,0,1];
+//            $A = [3,4,5,6,3,1,8,2,7];
+//            $B = [1,1,1,1,0,1,0,0,1];
 
         $alive = solution($A, $B);
 
-        dd($alive);
+        _d($alive);
     }
 
     /**
@@ -226,28 +219,28 @@ class StackAndQueuesController extends Controller
 
     expected worst-case time complexity is O(N);
     expected worst-case space complexity is O(1) (not counting the storage required for input arguments).
+     *
+     * 100%
 
      */
     public function nesting()
     {
         function solution($S) {
-            $open = '(';
-
-            $length = strlen($S);
-
-            if ($length % 2 != 0) return 0;
+            $N = strlen($S);
+            if ($N % 2 != 0) {
+                 return 0;
+            }
 
             $opened = 0;
-            for ($i = 0; $i < $length; $i++) {
-                $char = $S[$i];
-
-                if ($char == $open) {
-                    $opened++;
-                } else {
+            for ($i = 0; $i < $N; $i++) {
+                if ($S[$i] == ')') {
                     $opened--;
+
                     if ($opened < 0) {
                         return 0;
                     }
+                } else {
+                    $opened++;
                 }
             }
 
@@ -295,55 +288,35 @@ class StackAndQueuesController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function stone_wall()
     {
         function solution($H) {
-            $minHeights = [];
-            $minHeightCount = 0;
+            $stones = 0;
+            $levels = [];
 
-            $blocks = 0;
-            foreach ($H as $h) {
-                while ($minHeightCount) {
-                    $minHeight = array_pop($minHeights);
-                    $minHeightCount--;
+            foreach ($H as $i => $h) {
+                do {
+                    $level = array_pop($levels);
+                } while ($level > $h);
 
-                    while ($minHeightCount && $h < $minHeight) {
-                        $minHeight = array_pop($minHeights);
-                        $minHeightCount--;
-                    }
-
-                    if ($h < $minHeight) {
-                        $blocks++;
-                        array_push($minHeights, $h);
-                        $minHeightCount++;
-                    } elseif ($minHeight < $h) {
-                        $blocks++;
-                        array_push($minHeights, $minHeight);
-                        array_push($minHeights, $h);
-                        $minHeightCount += 2;
-                        break;
-                    } else {
-                        array_push($minHeights, $minHeight);
-                        $minHeightCount++;
-                        break;
-                    }
+                if ($level != $h) {
+                    $stones++;
+                    array_push($levels, $level);
                 }
 
-                if (!$minHeightCount) {
-                    $blocks++;
-                    array_push($minHeights, $h);
-                    $minHeightCount++;
-                }
+                array_push($levels, $h);
             }
 
-            return $blocks;
+            return $stones;
         }
 
-//        $H = [8,8,5,7,9,8,7,4,8];
+        $H = [8,8,5,7,9,8,7,4,8];
 //        $H = [1,1,1];
-        $H = [2, 3, 2, 1];
+//        $H = [2, 3, 2, 1];
 
         $blocks = solution($H);
 

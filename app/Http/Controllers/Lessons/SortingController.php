@@ -254,6 +254,9 @@ class SortingController extends Controller
      *
      * explanation:
      * http://www.lucainvernizzi.net/blog/2014/11/21/codility-beta-challenge-number-of-disc-intersections/
+     *
+     *
+     * to implement: http://thisthread.blogspot.com/2013/06/number-of-disc-intersections-linear.html (LINEAR)
 
      */
     public function number_of_disc_intersections()
