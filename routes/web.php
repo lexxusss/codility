@@ -65,8 +65,8 @@ Route::group(['namespace' => 'Lessons'], function(Router $route) {
     $route->get('/nesting', 'StackAndQueuesController@nesting');
     $route->get('/stone_wall', 'StackAndQueuesController@stone_wall');
 
-    $route->get('/dominator', 'LeaderController@dominator');
     $route->get('/equi_leader', 'LeaderController@equi_leader');
+    $route->get('/dominator', 'LeaderController@dominator');
 
     $route->get('/max_slice_problem', 'MaximumSliceProblemController@index');
     $route->get('/max_profit', 'MaximumSliceProblemController@max_profit');

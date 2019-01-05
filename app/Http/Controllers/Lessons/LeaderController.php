@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Lessons;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class LeaderController extends Controller
 {
@@ -58,65 +57,60 @@ class LeaderController extends Controller
     expected worst-case space complexity is O(N), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function equi_leader()
     {
-        function solution($A) {
-            $length = count($A);
-            $last = $length - 1;
-
-            // find leader
-            $counter = 0;
-            $leaders = [];
-
-            $leader = $A[0];
-            $leaders[$leader][0] = 1;
-
-            for ($i = 1; $i < $length; $i++) {
-                $item = $A[$i];
-                $leaders[$item][$i] = 1;
-
-                if ($counter == 0) {
-                    $counter++;
-                    $leader = $item;
-                } else {
-                    if ($item == $leader) {
-                        $counter++;
-                    } else {
-                        $counter--;
-                    }
-                }
+        function initOccurs($A) {
+            $occurs = [];
+            foreach ($A as $a) {
+                $occurs[$a] = 0;
             }
 
-            // define if it is a leader
-            $totalCountLeader = count($leaders[$leader]);
-            if ($counter && $totalCountLeader > ($length / 2)) {
-                // find equis
-                $equisCount = 0;
-                $leftCountLeader = 0;
-                foreach ($A as $key => $item) {
-                    if ($item == $leader) {
-                        $leftCountLeader++;
-                    }
-
-                    // if it is equi
-                    if ($leftCountLeader > ($key + 1) / 2) {
-                        $rightCountLeader = $totalCountLeader - $leftCountLeader;
-                        if ($rightCountLeader > ($last - $key) / 2) {
-                            $equisCount++;
-                        }
-                    }
-                }
-
-                return $equisCount;
-            }
-
-            return 0;
+            return $occurs;
         }
 
-//        $A = [4,3,4,4,4,2];
-        $A = [4, 4, 2, 5, 3, 4, 4, 4];
+        function solution($A) {
+            $N = count($A);
+
+            // find leader and total
+            $occurs = initOccurs($A);
+            $leader = null;
+            $total = 0;
+            foreach ($A as $a) {
+                $occurs[$a]++;
+
+                if ($occurs[$a] > $total) {
+                    $total = $occurs[$a];
+                    $leader = $a;
+                }
+            }
+
+            if ($total <= $N / 2) {
+                return 0;
+            }
+
+            $equiLeaders = 0;
+            $leftLeaders = 0;
+            $rightLeaders = $total - $leftLeaders;
+            foreach ($A as $k => $a) {
+                if ($a == $leader) {
+                    $leftLeaders++;
+                    $rightLeaders = $total - $leftLeaders;
+                }
+
+                if ($leftLeaders > ($k + 1) / 2 && $rightLeaders > ($N - $k - 1) / 2) {
+                    $equiLeaders++;
+                }
+            }
+
+            return $equiLeaders;
+        }
+
+        $A = [4,3,4,4,4,2];
+//        $A = [4, 4, 2, 5, 3, 4, 4, 4];
 
         $equi_leader = solution($A);
 
@@ -159,50 +153,35 @@ class LeaderController extends Controller
     expected worst-case space complexity is O(1), beyond input storage (not counting the storage required for input arguments).
 
     Elements of input arrays can be modified.
+     *
+     * 100%
 
      */
     public function dominator()
     {
         function solution($A) {
-            $stackSize = 0;
-            $lastStackKey = -1;
-            $lastStackValue = null;
-            foreach ($A as $key => $item) {
-                if ($stackSize == 0) {
-                    $stackSize++;
-                    $lastStackValue = $item;
-                    $lastStackKey = $key;
-                } else {
-                    if ($lastStackValue != $item) {
-                        $stackSize--;
-                    } else {
-                        $stackSize++;
-                    }
+            $dominator = -1;
+            $occurs = [];
+            $leaderK = $total = 0;
+            foreach ($A as $k => $a) {
+                $occurs[$a] = array_key_exists($a, $occurs) ? $occurs[$a] + 1 : 1;
+                if ($occurs[$a] > $total) {
+                    $total = $occurs[$a];
+                    $leaderK = $k;
                 }
             }
 
-            if ($stackSize) {
-                $candidate = $lastStackValue;
-
-                $count = 0;
-                foreach ($A as $item) {
-                    if ($item == $candidate) {
-                        $count++;
-                    }
-                }
-
-                if ($count > count($A) / 2) {
-                    return $lastStackKey;
-                }
-
+            if ($total > count($A) / 2) {
+                $dominator = $leaderK;
             }
 
-            return -1;
+
+            return $dominator;
         }
 
-//        $A = [3,4,3,2,3,-1,3,3];
+        $A = [3,4,3,2,3,-1,3,3];
 //        $A = [2, 1, 1, 1, 3];
-        $A = [0, 0];
+//        $A = [0, 0];
 
         $dominator = solution($A);
 
